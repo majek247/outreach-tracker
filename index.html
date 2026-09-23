@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GrowUp | Outreach Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    /* GrowUp Premium Brand Colors */
+    --brand-bg: #081414;
+    --brand-surface: #0E1F1F;
+    --brand-surface-hover: #142C2C;
+    --brand-border: #1A3535;
+    --brand-border-light: #234444;
+    --brand-primary: #1E9A9B;
+    --brand-primary-hover: #25B8B9;
+    --brand-text: #E6F0F0;
+    --brand-muted: #8FA8A8;
+    
+    /* Status Colors */
+    --danger: #E74C3C;
+    --danger-bg: rgba(231, 76, 60, 0.1);
+    --warn: #F1C40F;
+    --warn-bg: rgba(241, 196, 15, 0.1);
+    --ok: #2ECC71;
+    --ok-bg: rgba(46, 204, 113, 0.1);
+    --neutral: #7F8C8D;
+    --neutral-bg: rgba(127, 140, 141, 0.1);
+    
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Force dark mode for the premium feel */
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  
+  body { 
+    margin: 0; 
+    background: var(--brand-bg); 
+    color: var(--brand-text); 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    min-height: 100%; 
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  
+  header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: baseline; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+    margin-bottom: 32px; 
+    border-bottom: 1px solid var(--brand-border);
+    padding-bottom: 24px;
+  }
+  
+  h1 { font-size: 1.5rem; margin: 0; font-weight: 600; letter-spacing: -0.02em; }
+  .sub { color: var(--brand-muted); font-size: 0.9rem; font-weight: 400; }
+  
+  .setup { 
+    background: var(--warn-bg); 
+    border: 1px solid rgba(241, 196, 15, 0.3); 
+    color: var(--warn); 
+    border-radius: 8px; 
+    padding: 16px 20px; 
+    margin-bottom: 24px; 
+    font-size: 0.85rem; 
+    display: none; 
+    line-height: 1.5;
+  }
+  
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat { 
+    background: var(--brand-surface); 
+    border: 1px solid var(--brand-border); 
+    border-radius: 12px; 
+    padding: 20px; 
+    transition: border-color 0.2s ease;
+  }
+  .stat:hover { border-color: var(--brand-border-light); }
+  .stat .n { font-size: 2rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; letter-spacing: -0.03em; }
+  .stat .l { font-size: 0.75rem; color: var(--brand-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  
+  .stat.overdue .n { color: var(--danger); }
+  .stat.due .n { color: var(--warn); }
+  .stat.replied .n { color: var(--ok); }
+  
+  form.card, .card { 
+    background: var(--brand-surface); 
+    border: 1px solid var(--brand-border); 
+    border-radius: 12px; 
+    padding: 24px; 
+    margin-bottom: 24px; 
+  }
+  
+  .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .row > div { flex: 1; min-width: 140px; }
+  
+  label { display: block; font-size: 0.75rem; color: var(--brand-muted); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.02em; }
+  
+  input, select, textarea { 
+    width: 100%; 
+    padding: 10px 14px; 
+    border: 1px solid var(--brand-border); 
+    border-radius: 8px; 
+    background: var(--brand-bg); 
+    color: var(--brand-text); 
+    font-size: 0.9rem; 
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 2px rgba(30, 154, 155, 0.2);
+  }
+  
+  textarea { resize: vertical; min-height: 42px; }
+  
+  /* Custom Date Input Styling */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+  }
+  
+  button { 
+    background: var(--brand-primary); 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    padding: 10px 20px; 
+    font-size: 0.9rem; 
+    cursor: pointer; 
+    font-weight: 600; 
+    transition: background 0.2s ease, transform 0.1s ease;
+    font-family: inherit;
+  }
+  
+  button:hover { background: var(--brand-primary-hover); }
+  button:active { transform: translateY(1px); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  button.ghost { 
+    background: transparent; 
+    color: var(--brand-muted); 
+    border: 1px solid var(--brand-border); 
+    font-weight: 500; 
+    padding: 6px 12px; 
+    font-size: 0.75rem; 
+    border-radius: 6px;
+  }
+  button.ghost:hover { 
+    color: var(--brand-text); 
+    border-color: var(--brand-border-light);
+    background: var(--brand-surface-hover);
+  }
+  
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
+  .tab { 
+    padding: 8px 16px; 
+    border-radius: 20px; 
+    border: 1px solid var(--brand-border); 
+    font-size: 0.8rem; 
+    color: var(--brand-muted); 
+    cursor: pointer; 
+    white-space: nowrap; 
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  .tab:hover { border-color: var(--brand-border-light); color: var(--brand-text); }
+  .tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+  
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 700px; }
+  
+  th { 
+    text-align: left; 
+    font-size: 0.7rem; 
+    color: var(--brand-muted); 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    padding: 12px 8px; 
+    border-bottom: 1px solid var(--brand-border); 
+    font-weight: 600;
+  }
+  
+  td { 
+    padding: 16px 8px; 
+    border-bottom: 1px solid var(--brand-border); 
+    font-size: 0.85rem; 
+    vertical-align: middle; 
+  }
+  
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+  
+  .badge { 
+    padding: 4px 10px; 
+    border-radius: 12px; 
+    font-size: 0.7rem; 
+    font-weight: 600; 
+    display: inline-block; 
+    letter-spacing: 0.02em;
+  }
+  
+  .badge.overdue { background: var(--danger-bg); color: var(--danger); }
+  .badge.due { background: var(--warn-bg); color: var(--warn); }
+  .badge.upcoming { background: var(--neutral-bg); color: var(--neutral); }
+  .badge.replied { background: var(--ok-bg); color: var(--ok); }
+  .badge.closed { background: var(--neutral-bg); color: var(--neutral); }
+  
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  
+  .empty { text-align: center; color: var(--brand-muted); padding: 60px 0; font-size: 0.9rem; }
+  .company { color: var(--brand-muted); font-size: 0.75rem; margin-top: 4px; }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--brand-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--brand-border); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brand-border-light); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Outreach Tracker</h1>
+      <div class="sub">GrowUp — cold &amp; warm outreach accountability</div>
+    </div>
+  </header>
+
+  <div class="setup" id="setupMsg">
+    <strong>Setup Required:</strong> Add your Supabase URL and anon key at the top of the &lt;script&gt; block in index.html, then run schema.sql in your Supabase project's SQL editor. See README.md for the full steps.
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <form class="card" id="addForm">
+    <div class="row">
+      <div><label>Name</label><input id="f_name" required placeholder="Jane Doe"></div>
+      <div><label>Company</label><input id="f_company" placeholder="Acme Ltd"></div>
+      <div><label>Channel</label>
+        <select id="f_channel">
+          <option>LinkedIn</option><option>Email</option><option>Cold Call</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div><label>Date sent</label><input type="date" id="f_dateSent" required></div>
+      <div><label>Follow up in (days)</label><input type="number" id="f_days" value="3" min="1"></div>
+      <div><label>Notes</label><input id="f_notes" placeholder="e.g. found via LinkedIn search"></div>
+    </div>
+    <button type="submit" id="addBtn" style="margin-top: 8px;">Add contact</button>
+  </form>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="card table-scroll" style="padding: 0;">
+    <table>
+      <thead><tr><th>Contact</th><th>Channel</th><th>Sent</th><th>Follow-up</th><th>Status</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
+  </div>
+</div>
+
+<script>
+// ---- 1. Fill these in from your Supabase project (Settings > API) ----
+const SUPABASE_URL = 'https://qnacdxoxqnpveeeglhnd.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYWNkeG94cW5wdmVlZWdsaG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNTc4NjUsImV4cCI6MjEwNTczMzg2NX0.0H45NYEFSB5ENsXJwQ4ptM06Nk6l4vGx7L3euCCLKPo';
+// ------------------------------------------------------------------
+
+const configured = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
+const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+let filter = 'active';
+let contacts = [];
+
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function addDays(dateStr, n){ const d = new Date(dateStr); d.setDate(d.getDate()+Number(n)); return d.toISOString().slice(0,10); }
+function statusOf(c){
+  if(c.status === 'Replied' || c.status === 'Closed') return c.status;
+  const today = todayStr();
+  if(c.follow_up_date < today) return 'Overdue';
+  if(c.follow_up_date === today) return 'Due';
+  return 'Upcoming';
+}
+function badgeClass(s){ return {Overdue:'overdue',Due:'due',Upcoming:'upcoming',Replied:'replied',Closed:'closed'}[s]||'upcoming'; }
+function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+async function loadContacts(){
+  if(!supa) return;
+  const { data, error } = await supa.from('contacts').select('*').order('follow_up_date');
+  if(error){ console.error(error); return; }
+  contacts = data || [];
+}
+
+function renderStats(){
+  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed');
+  const overdue = active.filter(c=>statusOf(c)==='Overdue').length;
+  const due = active.filter(c=>statusOf(c)==='Due').length;
+  const replied = contacts.filter(c=>c.status==='Replied').length;
+  const rate = contacts.length ? Math.round(replied/contacts.length*100) : 0;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="n">${contacts.length}</div><div class="l">Total</div></div>
+    <div class="stat overdue"><div class="n">${overdue}</div><div class="l">Overdue</div></div>
+    <div class="stat due"><div class="n">${due}</div><div class="l">Due today</div></div>
+    <div class="stat replied"><div class="n">${rate}%</div><div class="l">Reply rate</div></div>`;
+}
+
+function renderTabs(){
+  const tabs = [['active','Active'],['Overdue','Overdue'],['Due','Due today'],['Replied','Replied'],['Closed','Closed'],['all','All']];
+  document.getElementById('tabs').innerHTML = tabs.map(([key,label])=>
+    `<div class="tab ${filter===key?'active':''}" data-f="${key}">${label}</div>`).join('');
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f; renderRows();renderTabs();});
+}
+
+function renderRows(){
+  let list = contacts.map(c=>({...c, _status: statusOf(c)}));
+  if(filter==='active') list = list.filter(c=>c._status!=='Replied' && c._status!=='Closed');
+  else if(filter!=='all') list = list.filter(c=>c._status===filter);
+  list.sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
+
+  const rows = document.getElementById('rows');
+  document.getElementById('emptyMsg').style.display = list.length ? 'none':'block';
+  rows.innerHTML = list.map(c => `
+    <tr>
+      <td><strong>${esc(c.name)}</strong><div class="company">${esc(c.company||'')}</div></td>
+      <td>${esc(c.channel)}</td>
+      <td>${c.date_sent}</td>
+      <td>${c.follow_up_date}</td>
+      <td><span class="badge ${badgeClass(c._status)}">${c._status}</span></td>
+      <td style="color: var(--brand-muted); font-size: 0.8rem;">${esc(c.notes||'')}</td>
+      <td><div class="actions">
+        ${c.status!=='Replied' ? `<button class="ghost" data-act="reply" data-id="${c.id}">Replied</button>`:''}
+        ${c.status!=='Closed' && c.status!=='Replied' ? `<button class="ghost" data-act="followup" data-id="${c.id}">Followed up</button>`:''}
+        ${c.status!=='Closed' ? `<button class="ghost" data-act="close" data-id="${c.id}">Close</button>`:''}
+        <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
+      </div></td>
+    </tr>`).join('');
+  rows.querySelectorAll('button').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+}
+
+function renderAll(){ renderStats(); renderTabs(); renderRows(); }
+
+async function handleAction(act,id){
+  if(!supa) return;
+  if(act==='reply') await supa.from('contacts').update({status:'Replied'}).eq('id', id);
+  if(act==='close') await supa.from('contacts').update({status:'Closed'}).eq('id', id);
+  if(act==='del') await supa.from('contacts').delete().eq('id', id);
+  if(act==='followup'){
+    const t = todayStr();
+    await supa.from('contacts').update({date_sent:t, follow_up_date:addDays(t,3), status:'Sent'}).eq('id', id);
+  }
+  await loadContacts(); renderAll();
+}
+
+document.getElementById('addForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!supa) return;
+  const dateSent = document.getElementById('f_dateSent').value || todayStr();
+  const days = document.getElementById('f_days').value || 3;
+  const row = {
+    id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    name: document.getElementById('f_name').value.trim(),
+    company: document.getElementById('f_company').value.trim(),
+    channel: document.getElementById('f_channel').value,
+    date_sent: dateSent,
+    follow_up_date: addDays(dateSent, days),
+    notes: document.getElementById('f_notes').value.trim(),
+    status: 'Sent'
+  };
+  const { error } = await supa.from('contacts').insert([row]);
+  if(error){ console.error(error); alert('Could not save — check the console and your Supabase setup.'); return; }
+  await loadContacts(); renderAll();
+  e.target.reset();
+  document.getElementById('f_dateSent').value = todayStr();
+  document.getElementById('f_days').value = 3;
+});
+
+(async function init(){
+  document.getElementById('f_dateSent').value = todayStr();
+  if(!configured){
+    document.getElementById('setupMsg').style.display = 'block';
+    document.getElementById('addBtn').disabled = true;
+    renderAll();
+    return;
+  }
+  await loadContacts();
+  renderAll();
+})();
+</script>
+</body>
+</html>
