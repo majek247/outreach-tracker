@@ -9,9 +9,9 @@
   :root{
     --bg:#0a1414; --bg2:#0f1c1c; --card:#122323; --card2:#0d1e1e;
     --border:#1e3535; --border-soft:#182a2a;
-    --teal:#1fb8ab; --teal-dim:#167273; --teal-glow:#1fb8ab33;
+    --teal:#1fb8ab; --teal-dim:#167273; --teal-glow:#1fb8ab22;
     --text:#eaf3f2; --muted:#7fa19c; --muted-dim:#4f6b67;
-    --danger:#e5654f; --warn:#e0a63d; --ok:#3ecf8e;
+    --danger:#e5654f; --warn:#e0a63d; --ok:#3ecf8e; --info:#5aa9e6; --dim:#5c7874;
     box-sizing:border-box;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
@@ -30,7 +30,7 @@
 
   .shell{display:flex;min-height:100vh;}
   .sidebar{
-    width:210px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--border-soft);
+    width:200px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--border-soft);
     position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:22px;
   }
   .brand{display:flex;align-items:center;gap:9px;padding:0 8px;}
@@ -38,10 +38,7 @@
   .brand .name{font-weight:700;font-size:.95rem;}
   .brand .tag{font-size:.6rem;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;}
   nav{display:flex;flex-direction:column;gap:2px;}
-  nav a{
-    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
-    font-size:.83rem;color:var(--muted);transition:.15s;
-  }
+  nav a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;font-size:.83rem;color:var(--muted);transition:.15s;}
   nav a:hover{background:var(--card2);color:var(--text);}
   nav a.active{background:var(--teal-glow);color:var(--teal);font-weight:600;}
   nav svg{width:15px;height:15px;flex-shrink:0;}
@@ -49,89 +46,151 @@
 
   .main{flex:1;min-width:0;padding:20px 26px 60px;}
   .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
-  .search{
-    flex:1;max-width:380px;display:flex;align-items:center;gap:8px;background:var(--card);
-    border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--muted);
-  }
-  .search input{background:transparent;border:none;outline:none;color:var(--text);font-size:.85rem;width:100%;}
-  .search svg{width:14px;height:14px;flex-shrink:0;}
   .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dim));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#04201d;}
 
-  .hero{margin-bottom:22px;}
-  .hero h1{font-size:1.65rem;margin:0 0 4px;letter-spacing:-.01em;}
-  .hero p{margin:0;color:var(--muted);font-size:.9rem;}
+  .hero{margin-bottom:20px;}
+  .hero h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em;}
+  .hero p{margin:0;color:var(--muted);font-size:.87rem;}
 
   .setup{background:#e0a63d1a;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:.85rem;display:none;}
 
-  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px;}
-  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
-  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;scroll-margin-top:20px;}
-  .panel h2{font-size:.9rem;margin:0 0 2px;}
-  .panel .sub{font-size:.72rem;color:var(--muted-dim);margin-bottom:14px;}
+  /* ---- Stats ---- */
+  .fu-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px;}
+  .fu-stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:5px;cursor:pointer;transition:.15s;}
+  .fu-stat:hover{border-color:var(--teal-dim);}
+  .fu-stat.on{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal) inset;}
+  .fu-stat .top{display:flex;align-items:center;gap:7px;font-size:.68rem;color:var(--muted);letter-spacing:.03em;font-weight:600;}
+  .fu-stat .dot{width:7px;height:7px;border-radius:50%;}
+  .fu-stat .n{font-size:1.65rem;font-weight:800;line-height:1;}
+  .fu-stat.danger .n{color:var(--danger);} .fu-stat.danger .dot{background:var(--danger);}
+  .fu-stat.warn .n{color:var(--warn);}     .fu-stat.warn .dot{background:var(--warn);}
+  .fu-stat.info .n{color:var(--info);}     .fu-stat.info .dot{background:var(--info);}
+  .fu-stat.ok .n{color:var(--ok);}         .fu-stat.ok .dot{background:var(--ok);}
 
-  .fu-group{margin-bottom:18px;}
-  .fu-group:last-child{margin-bottom:0;}
-  .fu-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--card2);border:1px solid var(--border-soft);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;}
-  .fu-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px;}
-  .fu-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
-  .fu-stat .n{font-size:1.5rem;font-weight:800;}
-  .fu-stat.warn .n{color:var(--warn);}
-  .fu-stat.danger .n{color:var(--danger);}
-  .fu-stat.teal .n{color:var(--teal);}
-  .fu-stat.ok .n{color:var(--ok);}
-  .fu-stat .l{font-size:.72rem;color:var(--muted);margin-top:2px;}
-  .today-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:.82rem;}
-  .today-item:last-child{border-bottom:none;}
-  .today-item .who b{font-weight:600;}
-  .today-item .chan{font-size:.7rem;color:var(--muted-dim);}
-  .insights-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:.85rem;}
-  .insights-row:last-child{border-bottom:none;}
-  .insights-row .v{font-weight:700;font-size:1rem;}
-  .next-step-cell{
-    cursor:pointer; border-radius:8px; padding:6px 10px; transition:.15s;
-    border:1px solid var(--border); background:var(--card2); display:block;
-    width:100%; font-size:.75rem; font-weight:500; color:var(--text);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box;
+  /* ---- Layout: table + sidebar ---- */
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;}
+  @media(max-width:980px){.layout{grid-template-columns:1fr;}}
+
+  .board{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+
+  .tabs{display:flex;gap:2px;padding:10px 12px 0;border-bottom:1px solid var(--border-soft);}
+  .tab{display:flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px 9px 0 0;font-size:.8rem;color:var(--muted);cursor:pointer;font-weight:600;border:1px solid transparent;border-bottom:none;}
+  .tab .c{font-size:.68rem;background:var(--card2);color:var(--muted-dim);padding:1px 6px;border-radius:20px;font-weight:700;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--teal);background:var(--card2);border-color:var(--border-soft);}
+  .tab.active .c{background:var(--teal-glow);color:var(--teal);}
+
+  .toolbar{display:flex;align-items:center;gap:10px;padding:12px 16px;flex-wrap:wrap;}
+  .search{flex:1;min-width:180px;display:flex;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:7px 11px;color:var(--muted);}
+  .search input{background:transparent;border:none;outline:none;color:var(--text);font-size:.83rem;width:100%;}
+  .search svg{width:13px;height:13px;flex-shrink:0;}
+  select.filt{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:7px 10px;font-size:.8rem;}
+  select.filt:focus{outline:none;border-color:var(--teal);}
+
+  .table-wrap{overflow-x:auto;}
+  table.fu-table{width:100%;border-collapse:collapse;min-width:820px;}
+  table.fu-table thead th{
+    text-align:left;font-size:.66rem;color:var(--muted-dim);text-transform:uppercase;letter-spacing:.05em;font-weight:700;
+    padding:9px 14px;border-bottom:1px solid var(--border-soft);white-space:nowrap;
   }
-  .next-step-cell:hover{border-color:var(--teal-dim);background:var(--card);}
-  .next-step-cell.empty{color:var(--muted-dim);font-style:italic;}
-  textarea#ns_text{resize:vertical;min-height:80px;font-family:inherit;}
+  table.fu-table tbody td{padding:12px 14px;border-bottom:1px solid var(--border-soft);font-size:.83rem;vertical-align:middle;}
+  table.fu-table tbody tr:last-child td{border-bottom:none;}
+  table.fu-table tbody tr:hover{background:var(--card2);}
 
-  button{background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:10px 18px;font-size:.85rem;cursor:pointer;font-weight:700;}
-  button:hover{filter:brightness(1.1);}
-  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);font-weight:500;padding:5px 10px;font-size:.72rem;}
-  button.ghost:hover{color:var(--text);border-color:var(--teal-dim);}
+  .contact-cell{display:flex;align-items:center;gap:10px;}
+  .avc{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#04201d;}
+  .contact-cell .name{font-weight:600;font-size:.84rem;}
+  .company-cell{color:var(--muted);}
+  .channel-badge{font-size:.7rem;color:var(--muted);background:var(--card2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .date-cell{white-space:nowrap;color:var(--muted);}
+  .date-cell b{color:var(--text);font-weight:500;}
 
-  .table-scroll{overflow-x:auto;}
-  table{width:100%;border-collapse:collapse;min-width:680px;}
-  th{text-align:left;font-size:.66rem;color:var(--muted-dim);text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--border);}
-  td{padding:11px 10px;border-bottom:1px solid var(--border-soft);font-size:.85rem;vertical-align:middle;}
-  .company{color:var(--muted);font-size:.74rem;}
-  .badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;display:inline-block;}
-  .badge.overdue{background:#e5654f22;color:var(--danger);}
-  .badge.due{background:#e0a63d22;color:var(--warn);}
-  .badge.upcoming{background:#7fa19c22;color:var(--muted);}
-  .badge.replied{background:#3ecf8e22;color:var(--ok);}
-  .badge.closed{background:#7fa19c22;color:var(--muted-dim);}
-  .empty{text-align:center;color:var(--muted-dim);padding:30px 0;font-size:.85rem;}
+  .pill{font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;display:inline-block;}
+  .pill.danger{background:#e5654f1e;color:var(--danger);}
+  .pill.warn{background:#e0a63d1e;color:var(--warn);}
+  .pill.info{background:#5aa9e61e;color:var(--info);}
+  .pill.ok{background:#3ecf8e1e;color:var(--ok);}
+  .pill.dim{background:#5c78741e;color:var(--dim);}
+
+  .stage-select{font-size:.72rem;font-weight:700;padding:5px 8px;border-radius:20px;border:1px solid var(--border);background:var(--card2);color:var(--text);cursor:pointer;}
+  .stage-select.danger{color:var(--danger);border-color:var(--danger);}
+  .stage-select.warn{color:var(--warn);border-color:var(--warn);}
+  .stage-select.info{color:var(--info);border-color:var(--info);}
+  .stage-select.ok{color:var(--ok);border-color:var(--ok);}
+  .stage-select.dim{color:var(--dim);border-color:var(--border);}
+
+  .next-cell{cursor:pointer;color:var(--text);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .next-cell:hover{color:var(--teal);}
+  .next-cell.empty{color:var(--muted-dim);font-style:italic;}
+
+  .row-actions{display:flex;align-items:center;gap:6px;justify-content:flex-end;}
+  .btn-log{background:var(--teal);color:#04201d;border:none;border-radius:7px;padding:6px 11px;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .btn-log:hover{filter:brightness(1.1);}
+  .kebab{position:relative;}
+  .kebab-btn{background:transparent;border:1px solid var(--border);color:var(--muted);width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:1rem;line-height:1;}
+  .kebab-btn:hover{color:var(--text);border-color:var(--teal-dim);}
+  .kebab-menu{position:fixed;background:var(--card2);border:1px solid var(--border);border-radius:9px;min-width:140px;z-index:200;overflow:hidden;box-shadow:0 8px 24px #000a;display:none;}
+  .kebab-menu.open{display:block;}
+  .kebab-menu button{display:block;width:100%;text-align:left;background:transparent;color:var(--text);border:none;padding:9px 12px;font-size:.78rem;font-weight:500;cursor:pointer;border-radius:0;}
+  .kebab-menu button:hover{background:var(--teal-glow);color:var(--teal);}
+
+  .table-foot{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--border-soft);font-size:.76rem;color:var(--muted-dim);}
+  .pager{display:flex;gap:4px;}
+  .pager button{background:var(--card2);border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:6px;font-size:.75rem;cursor:pointer;}
+  .pager button.active{background:var(--teal);border-color:var(--teal);color:#04201d;font-weight:700;}
+  .pager button:hover:not(.active){color:var(--text);}
+  .pager button:disabled{opacity:.4;cursor:default;}
+
+  .empty-row td{text-align:center;color:var(--muted-dim);padding:36px 0;font-style:italic;}
+
+  /* ---- Sidebar panels ---- */
+  .side-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;}
+  .side-panel h2{font-size:.85rem;margin:0 0 2px;}
+  .side-panel .sub{font-size:.7rem;color:var(--muted-dim);margin-bottom:12px;}
+  .today-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-soft);}
+  .today-item:last-child{border-bottom:none;}
+  .today-item .t-info{flex:1;min-width:0;}
+  .today-item .t-name{font-size:.8rem;font-weight:600;}
+  .today-item .t-step{font-size:.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .today-empty{font-size:.78rem;color:var(--muted-dim);padding:6px 0;font-style:italic;}
+
+  .insights-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:.82rem;}
+  .insights-row:last-child{border-bottom:none;}
+  .insights-row .v{font-weight:700;font-size:.95rem;}
+
+  .spark{display:flex;gap:3px;align-items:flex-end;height:44px;margin-top:4px;}
+  .spark div{flex:1;background:linear-gradient(180deg,var(--teal),var(--teal-dim));border-radius:2px 2px 0 0;min-height:2px;}
+
+  /* ---- Modals ---- */
   .modal-overlay{display:none;position:fixed;inset:0;background:#04100fcc;backdrop-filter:blur(3px);z-index:50;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.open{display:flex;}
   .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
   .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .modal-head h2{font-size:1.05rem;margin:0;}
+  .modal-head .who{font-size:.78rem;color:var(--muted);margin-top:2px;}
   .modal-close{background:transparent;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1;}
-  .stage-select{padding:5px 8px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid var(--border);background:var(--card2);cursor:pointer;}
-  .stage-select.overdue{color:var(--danger);border-color:var(--danger);}
-  .stage-select.due{color:var(--warn);border-color:var(--warn);}
-  .stage-select.upcoming{color:var(--muted);}
-  .stage-select.replied{color:var(--ok);border-color:var(--ok);}
-  .stage-select.closed{color:var(--muted-dim);}
+  .modal-close:hover{color:var(--text);}
+
   .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
   .row > div{flex:1;min-width:130px;}
-  label{display:block;font-size:.68rem;color:var(--muted-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
-  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text);font-size:.87rem;}
+  label{display:block;font-size:.68rem;color:var(--muted-dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+  input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text);font-size:.87rem;font-family:inherit;}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
-  .week-empty{color:var(--muted-dim);font-size:.8rem;padding:8px 0;}
+  textarea{resize:vertical;min-height:90px;}
+
+  .quick-days{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .quick-days button{background:var(--card2);color:var(--muted);border:1px solid var(--border);font-weight:600;font-size:.72rem;padding:6px 12px;border-radius:20px;}
+  .quick-days button:hover{color:var(--teal);border-color:var(--teal-dim);}
+  .quick-days button.active{background:var(--teal);color:#04201d;border-color:var(--teal);font-weight:700;}
+
+  .btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  button{font-family:inherit;}
+  .ghost{background:transparent;color:var(--muted);border:1px solid var(--border);font-weight:500;border-radius:8px;padding:8px 14px;font-size:.78rem;cursor:pointer;}
+  .ghost:hover{color:var(--text);border-color:var(--teal-dim);}
+  .primary{background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:8px 14px;font-size:.78rem;cursor:pointer;font-weight:700;}
+  .primary:hover{filter:brightness(1.1);}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;font-size:.85rem;z-index:100;transition:opacity .3s;}
 </style>
 </head>
 <body>
@@ -145,11 +204,11 @@
       <a href="index.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
         Dashboard</a>
-      <a href="index.html#outreach">
+      <a href="outreach.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         Outreach</a>
       <a href="followups.html" class="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
         Follow-ups</a>
     </nav>
     <div class="side-foot">Turn conversations<br>into pipeline.</div>
@@ -157,51 +216,122 @@
 
   <main class="main">
     <div class="topbar">
-      <div class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input id="searchBox" placeholder="Search prospects, companies…">
-      </div>
+      <div></div>
       <div class="avatar">MJ</div>
     </div>
 
     <div class="hero">
       <h1>Follow-ups</h1>
-      <p>Stay on top of every conversation that needs a nudge.</p>
+      <p>Everything that needs a touch, in one table. Log it the moment you do it.</p>
     </div>
 
     <div class="setup" id="setupMsg">
-      Add your Supabase URL and anon key at the top of the &lt;script&gt; block.
+      Add your Supabase URL and anon key at the top of the &lt;script&gt; block, then run the schema update in the SQL editor.
     </div>
 
     <div class="fu-stats" id="fuStats"></div>
 
-    <div class="panel table-scroll" style="margin-bottom:14px;padding:6px 8px;">
-      <h2 style="padding:12px 12px 0;">All Follow-ups</h2>
-      <div class="sub" style="padding:0 12px;">Sorted by follow-up date, most urgent first</div>
-      <table>
-        <thead><tr><th>Contact</th><th>Channel</th><th>Last Outreach</th><th>Follow-up Date</th><th>Status</th><th>Notes</th><th>Next Step</th></tr></thead>
-        <tbody id="followupsRows"></tbody>
-      </table>
-      <div class="empty" id="followupsEmpty" style="display:none;">Nothing to follow up on — you are all caught up.</div>
+    <div class="layout">
+      <div class="board">
+        <div class="tabs" id="tabs"></div>
+        <div class="toolbar">
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="searchBox" placeholder="Search contacts, companies…">
+          </div>
+          <select class="filt" id="channelFilt"><option value="">All channels</option></select>
+          <button type="button" class="ghost" id="resetBtn">Reset</button>
+        </div>
+        <div class="table-wrap">
+          <table class="fu-table">
+            <thead>
+              <tr>
+                <th>Contact</th>
+                <th>Company</th>
+                <th>Channel</th>
+                <th>Last outreach</th>
+                <th>Follow-up date</th>
+                <th>Status</th>
+                <th>Next step</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="table-foot">
+          <span id="countLabel">—</span>
+          <div class="pager" id="pager"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-col">
+        <div class="side-panel">
+          <h2>Due today</h2>
+          <div class="sub">Reach out to these first</div>
+          <div id="todayBody"></div>
+        </div>
+        <div class="side-panel">
+          <h2>Performance</h2>
+          <div class="sub">All-time stats</div>
+          <div id="insightsBody"></div>
+          <div class="spark" id="sparkBody"></div>
+          <div class="sub" id="sparkLabel" style="margin:6px 0 0;"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="grid2">
-      <div class="panel">
-        <h2>Today's Follow-ups</h2>
-        <div class="sub">Due today, at a glance</div>
-        <div id="todayBody"></div>
-      </div>
-      <div class="panel">
-        <h2>Follow-up Insights</h2>
-        <div class="sub">How your outreach is performing</div>
-        <div id="fuInsightsBody"></div>
+    <!-- Log follow-up modal -->
+    <div class="modal-overlay" id="logModalOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <div>
+            <h2>Log follow-up</h2>
+            <div class="who" id="logWho">—</div>
+          </div>
+          <button type="button" class="modal-close" id="closeLogModal">&times;</button>
+        </div>
+        <form id="logForm">
+          <div class="row">
+            <div><label>Followed up on</label><input type="date" id="log_date" required></div>
+            <div>
+              <label>Next follow-up in</label>
+              <select id="log_next">
+                <option value="2">2 days</option>
+                <option value="3" selected>3 days</option>
+                <option value="5">5 days</option>
+                <option value="7">1 week</option>
+                <option value="14">2 weeks</option>
+              </select>
+            </div>
+          </div>
+          <div class="quick-days" id="quickDays">
+            <button type="button" data-quick="0">Today</button>
+            <button type="button" data-quick="1">Yesterday</button>
+            <button type="button" data-quick="2">2 days ago</button>
+          </div>
+          <div class="row" style="margin-top:14px;">
+            <div style="min-width:100%;">
+              <label>Note (optional)</label>
+              <textarea id="log_note" placeholder="e.g. Left voicemail, will try again Friday"></textarea>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="ghost" id="cancelLogBtn">Cancel</button>
+            <button type="submit" class="primary">Log follow-up</button>
+          </div>
+        </form>
       </div>
     </div>
 
+    <!-- Next step modal -->
     <div class="modal-overlay" id="nsModalOverlay">
       <div class="modal">
         <div class="modal-head">
-          <h2 id="ns_title">Next step</h2>
+          <div>
+            <h2>Next step</h2>
+            <div class="who" id="nsWho">—</div>
+          </div>
           <button type="button" class="modal-close" id="closeNsModal">&times;</button>
         </div>
         <form id="nsForm">
@@ -211,7 +341,10 @@
               <textarea id="ns_text" placeholder="e.g. Book a call, send pricing, share case study…"></textarea>
             </div>
           </div>
-          <button type="submit">Save</button>
+          <div class="btn-row">
+            <button type="button" class="ghost" id="cancelNsBtn">Cancel</button>
+            <button type="submit" class="primary">Save</button>
+          </div>
         </form>
       </div>
     </div>
@@ -227,19 +360,45 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const configured = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
 const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-let query = '';
 let contacts = [];
+let query = '';
+let channelFilter = '';
+let activeTab = 'all';
+let page = 1;
+const PAGE_SIZE = 10;
+let openMenuId = null;
+
+const AV_COLORS = ['#1fb8ab','#5aa9e6','#e0a63d','#e5654f','#9b7fe6','#3ecf8e'];
+function avatarColor(s){
+  let h = 0; for(const c of String(s)) h = (h*31 + c.charCodeAt(0)) % AV_COLORS.length;
+  return AV_COLORS[h];
+}
+function initials(s){ return String(s||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function addDays(dateStr, n){ const d = new Date(dateStr); d.setDate(d.getDate()+Number(n)); return d.toISOString().slice(0,10); }
+function humanDate(s){
+  if(!s) return '—';
+  const d = new Date(s + 'T00:00:00');
+  const today = new Date(todayStr() + 'T00:00:00');
+  const diff = Math.round((d - today) / 86400000);
+  if(diff === 0) return 'Today';
+  if(diff === 1) return 'Tomorrow';
+  if(diff === -1) return 'Yesterday';
+  if(diff < -1 && diff > -7) return `${-diff}d ago`;
+  if(diff > 1 && diff < 7) return `in ${diff}d`;
+  return d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+}
 function statusOf(c){
-  if(c.status === 'Replied' || c.status === 'Closed') return c.status;
+  if(['Replied','Won','Lost'].includes(c.status)) return c.status;
   const today = todayStr();
   if(c.follow_up_date < today) return 'Overdue';
-  if(c.follow_up_date === today) return 'Due';
+  if(c.follow_up_date === today) return 'Due Today';
   return 'Upcoming';
 }
-function badgeClass(s){ return {Overdue:'overdue',Due:'due',Upcoming:'upcoming',Replied:'replied',Closed:'closed'}[s]||'upcoming'; }
+function pillClass(status){
+  return {Overdue:'danger','Due Today':'warn',Upcoming:'info','Meeting Booked':'info',Replied:'ok',Won:'ok',Lost:'dim',Closed:'dim'}[status] || 'dim';
+}
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
 async function loadContacts(){
@@ -247,160 +406,367 @@ async function loadContacts(){
   const { data, error } = await supa.from('contacts').select('*').order('follow_up_date');
   if(error){ console.error(error); return; }
   contacts = data || [];
+  populateChannelFilter();
 }
 
-function filtered(){
-  return contacts.filter(c=>{
-    if(!query) return true;
-    const q = query.toLowerCase();
-    return (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q);
-  });
+function populateChannelFilter(){
+  const sel = document.getElementById('channelFilt');
+  const current = sel.value;
+  const channels = [...new Set(contacts.map(c=>c.channel).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All channels</option>' + channels.map(ch=>`<option value="${esc(ch)}">${esc(ch)}</option>`).join('');
+  sel.value = channels.includes(current) ? current : '';
 }
 
+function withStatus(){ return contacts.map(c => ({...c, _status: statusOf(c)})); }
+
+function matchesQuery(c){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q);
+}
+function matchesChannel(c){ return !channelFilter || c.channel === channelFilter; }
+function matchesTab(c){
+  if(activeTab === 'all') return true;
+  if(activeTab === 'overdue') return c._status === 'Overdue';
+  if(activeTab === 'due') return c._status === 'Due Today';
+  if(activeTab === 'upcoming') return c._status === 'Upcoming';
+  if(activeTab === 'completed') return ['Replied','Won','Lost'].includes(c._status);
+  return true;
+}
+
+function filteredSorted(){
+  const rank = {Overdue:0,'Due Today':1,Upcoming:2,Replied:3,Closed:4};
+  return withStatus()
+    .filter(c=>matchesQuery(c) && matchesChannel(c) && matchesTab(c))
+    .sort((a,b)=> (rank[a._status]-rank[b._status]) || a.follow_up_date.localeCompare(b.follow_up_date));
+}
+
+/* ---------- Stats ---------- */
 function renderFuStats(){
   const el = document.getElementById('fuStats');
   const today = todayStr();
-  const weekEnd = addDays(today, 7);
-  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed');
-  const due = active.filter(c=>c.follow_up_date===today).length;
-  const overdue = active.filter(c=>c.follow_up_date<today).length;
-  const upcoming = active.filter(c=>c.follow_up_date>today && c.follow_up_date<=weekEnd).length;
-  const completed = contacts.filter(c=>c.status==='Replied' || c.status==='Closed').length;
+  const active = contacts.filter(c=>!['Replied','Won','Lost'].includes(c.status));
+  const overdue = active.filter(c=>c.follow_up_date < today).length;
+  const due = active.filter(c=>c.follow_up_date === today).length;
+  const next7 = active.filter(c=>c.follow_up_date > today && c.follow_up_date <= addDays(today, 7)).length;
+  const completed = contacts.filter(c=>['Replied','Won','Lost'].includes(c.status)).length;
+
   const cards = [
-    ['warn', due, 'Due Today'],
-    ['danger', overdue, 'Overdue'],
-    ['teal', upcoming, 'Upcoming (7 days)'],
-    ['ok', completed, 'Completed']
+    ['danger', overdue, 'Overdue', 'overdue'],
+    ['warn', due, 'Due Today', 'due'],
+    ['info', next7, 'Next 7 Days', 'upcoming'],
+    ['ok', completed, 'Completed', 'completed'],
   ];
-  el.innerHTML = cards.map(([cls,n,l])=>`
-    <div class="fu-stat ${cls}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  el.innerHTML = cards.map(([cls, n, l, tab])=>`
+    <div class="fu-stat ${cls} ${activeTab===tab?'on':''}" data-tab="${tab}">
+      <div class="top"><span class="dot"></span>${l}</div>
+      <div class="n">${n}</div>
+    </div>`).join('');
+  el.querySelectorAll('.fu-stat').forEach(card=>{
+    card.onclick = ()=>{ activeTab = card.dataset.tab; page = 1; renderAll(); };
+  });
 }
 
+/* ---------- Tabs ---------- */
+function renderTabs(){
+  const rows = withStatus();
+  const counts = {
+    all: rows.length,
+    overdue: rows.filter(c=>c._status==='Overdue').length,
+    due: rows.filter(c=>c._status==='Due Today').length,
+    upcoming: rows.filter(c=>c._status==='Upcoming').length,
+    completed: rows.filter(c=>['Replied','Won','Lost'].includes(c._status)).length,
+  };
+  const defs = [['all','All'],['overdue','Overdue'],['due','Due Today'],['upcoming','Upcoming'],['completed','Completed']];
+  document.getElementById('tabs').innerHTML = defs.map(([k,l])=>`
+    <div class="tab ${activeTab===k?'active':''}" data-tab="${k}">${l} <span class="c">${counts[k]}</span></div>
+  `).join('');
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick = ()=>{ activeTab = t.dataset.tab; page = 1; renderAll(); };
+  });
+}
+
+/* ---------- Table ---------- */
+function renderTable(){
+  const all = filteredSorted();
+  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  if(page > totalPages) page = totalPages;
+  const start = (page-1)*PAGE_SIZE;
+  const rows = all.slice(start, start+PAGE_SIZE);
+
+  const tbody = document.getElementById('tbody');
+  if(!rows.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">Nothing here — try a different filter.</td></tr>`;
+  } else {
+    tbody.innerHTML = rows.map(c=>{
+      const cls = pillClass(c._status);
+      const isActive = !['Replied','Won','Lost'].includes(c._status);
+      return `
+      <tr data-id="${c.id}">
+        <td>
+          <div class="contact-cell">
+            <div class="avc" style="background:${avatarColor(c.name)}">${esc(initials(c.name))}</div>
+            <div class="name">${esc(c.name)}</div>
+          </div>
+        </td>
+        <td class="company-cell">${esc(c.company || '—')}</td>
+        <td><span class="channel-badge">${esc(c.channel || '—')}</span></td>
+        <td class="date-cell"><b>${humanDate(c.last_follow_up || c.date_sent)}</b></td>
+        <td class="date-cell"><b>${humanDate(c.follow_up_date)}</b></td>
+        <td>
+          <select class="stage-select ${cls}" data-act="stage" data-id="${c.id}">
+            <option value="Sent" ${!['Replied','Meeting Booked','Won','Lost'].includes(c.status)?'selected':''}>${c._status==='Overdue'||c._status==='Due Today'?c._status:'Active'}</option>
+            <option value="Meeting Booked" ${c.status==='Meeting Booked'?'selected':''}>Meeting Booked</option>
+            <option value="Replied" ${c.status==='Replied'?'selected':''}>Replied</option>
+            <option value="Won" ${c.status==='Won'?'selected':''}>Won</option>
+            <option value="Lost" ${c.status==='Lost'?'selected':''}>Lost</option>
+          </select>
+        </td>
+        <td>
+          <div class="next-cell ${c.next_step?'':'empty'}" data-act="editns" data-id="${c.id}">
+            ${esc(c.next_step || 'Add next step…')}
+          </div>
+        </td>
+        <td>
+          <div class="row-actions">
+            ${isActive ? `<button type="button" class="btn-log" data-act="log" data-id="${c.id}">Log</button>` : ''}
+            <div class="kebab">
+              <button type="button" class="kebab-btn" data-act="kebab" data-id="${c.id}">⋯</button>
+              <div class="kebab-menu" data-menu="${c.id}">
+                ${isActive ? `
+                  <button type="button" data-act="reply" data-id="${c.id}">Mark replied</button>
+                  <button type="button" data-act="won" data-id="${c.id}">Mark won</button>
+                  <button type="button" data-act="lost" data-id="${c.id}">Mark lost</button>
+                ` : `
+                  <button type="button" data-act="reopen" data-id="${c.id}">Reopen</button>
+                `}
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('countLabel').textContent =
+    all.length ? `Showing ${start+1}–${Math.min(start+PAGE_SIZE, all.length)} of ${all.length}` : 'No follow-ups match';
+
+  renderPager(totalPages);
+  wireRowActions();
+}
+
+function renderPager(totalPages){
+  const el = document.getElementById('pager');
+  if(totalPages <= 1){ el.innerHTML = ''; return; }
+  let html = `<button type="button" data-p="${page-1}" ${page===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=totalPages;i++){
+    if(totalPages > 7 && Math.abs(i-page) > 2 && i!==1 && i!==totalPages){
+      if(i === 2 || i === totalPages-1) html += `<span style="padding:0 4px;">…</span>`;
+      continue;
+    }
+    html += `<button type="button" data-p="${i}" class="${i===page?'active':''}">${i}</button>`;
+  }
+  html += `<button type="button" data-p="${page+1}" ${page===totalPages?'disabled':''}>›</button>`;
+  el.innerHTML = html;
+  el.querySelectorAll('button[data-p]').forEach(b=>{
+    b.onclick = ()=>{ page = Number(b.dataset.p); renderTable(); };
+  });
+}
+
+function wireRowActions(){
+  document.querySelectorAll('#tbody select[data-act="stage"]').forEach(sel=>{
+    sel.onchange = ()=>{
+      const v = sel.value;
+      const act = v==='Replied' ? 'reply' : v==='Won' ? 'won' : v==='Lost' ? 'lost' : v==='Meeting Booked' ? 'meeting' : 'reopen';
+      handleAction(act, sel.dataset.id);
+    };
+  });
+  document.querySelectorAll('#tbody [data-act]:not(select)').forEach(el=>{
+    el.onclick = (e)=>{
+      e.stopPropagation();
+      const act = el.dataset.act, id = el.dataset.id;
+      if(act === 'log') return openLogModal(id);
+      if(act === 'editns') return openNsModal(id);
+      if(act === 'kebab') return toggleKebab(id);
+      return handleAction(act, id);
+    };
+  });
+}
+
+function toggleKebab(id){
+  const menu = document.querySelector(`.kebab-menu[data-menu="${id}"]`);
+  const btn = document.querySelector(`.kebab-btn[data-id="${id}"]`);
+  const isOpen = menu.classList.contains('open');
+  document.querySelectorAll('.kebab-menu.open').forEach(m=>m.classList.remove('open'));
+  if(!isOpen){
+    menu.classList.add('open');
+    const r = btn.getBoundingClientRect();
+    const mw = menu.offsetWidth || 140;
+    menu.style.top = (r.bottom + 4) + 'px';
+    menu.style.left = (r.right - mw) + 'px';
+    openMenuId = id;
+  } else { openMenuId = null; }
+}
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.kebab-menu.open').forEach(m=>m.classList.remove('open'));
+  openMenuId = null;
+});
+
+/* ---------- Sidebar: due today ---------- */
 function renderToday(){
-  const body = document.getElementById('todayBody');
   const today = todayStr();
-  const due = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed' && c.follow_up_date===today);
-  if(!due.length){ body.innerHTML = '<div class="week-empty">Nothing due today.</div>'; return; }
+  const due = contacts.filter(c=>!['Replied','Won','Lost'].includes(c.status) && c.follow_up_date <= today)
+    .sort((a,b)=>a.follow_up_date.localeCompare(b.follow_up_date))
+    .slice(0,5);
+  const body = document.getElementById('todayBody');
+  if(!due.length){ body.innerHTML = `<div class="today-empty">Nothing due, you’re caught up.</div>`; return; }
   body.innerHTML = due.map(c=>`
     <div class="today-item">
-      <div class="who"><b>${esc(c.name)}</b> — ${esc(c.company||'')} <div class="chan">${esc(c.channel)}</div></div>
-      <div class="fu-actions">
-        <button class="ghost" data-act="followup" data-id="${c.id}">Followed up</button>
-        <button class="ghost" data-act="reply" data-id="${c.id}">Replied</button>
+      <div class="avc" style="background:${avatarColor(c.name)}">${esc(initials(c.name))}</div>
+      <div class="t-info">
+        <div class="t-name">${esc(c.name)}${c.company? ' · '+esc(c.company):''}</div>
+        <div class="t-step">${esc(c.next_step || 'No next step set')}</div>
       </div>
-    </div>`).join('');
-  body.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+      <button type="button" class="btn-log" data-act="log" data-id="${c.id}">Log</button>
+    </div>
+  `).join('');
+  body.querySelectorAll('[data-act="log"]').forEach(b=>{
+    b.onclick = ()=> openLogModal(b.dataset.id);
+  });
 }
 
-function renderFuInsights(){
-  const body = document.getElementById('fuInsightsBody');
+/* ---------- Sidebar: insights + momentum ---------- */
+function renderInsights(){
   const total = contacts.length;
   const replied = contacts.filter(c=>c.status==='Replied').length;
-  const closed = contacts.filter(c=>c.status==='Closed').length;
-  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed').length;
-  const rate = total ? Math.round(replied/total*100) : 0;
+  const won = contacts.filter(c=>c.status==='Won').length;
+  const lost = contacts.filter(c=>c.status==='Lost').length;
+  const active = contacts.filter(c=>!['Replied','Won','Lost'].includes(c.status)).length;
+  const rate = total ? Math.round((replied + won + lost)/total*100) : 0;
   const rows = [
-    ['Reply rate', rate+'%'],
+    ['Reply + close rate', rate+'%'],
     ['Active conversations', active],
     ['Replied', replied],
-    ['Closed', closed]
+    ['Won', won],
+    ['Lost', lost],
+    ['Total contacts', total],
   ];
-  body.innerHTML = rows.map(([l,v])=>`
-    <div class="insights-row"><span>${l}</span><span class="v">${v}</span></div>`).join('');
+  document.getElementById('insightsBody').innerHTML = rows.map(([l,v])=>
+    `<div class="insights-row"><span>${l}</span><span class="v">${v}</span></div>`).join('');
+
+  const days = [...Array(7)].map((_,i)=> addDays(todayStr(), i-6));
+  const counts = days.map(d => contacts.filter(c=> c.last_follow_up === d).length);
+  const max = Math.max(1, ...counts);
+  document.getElementById('sparkBody').innerHTML = counts.map(c=>
+    `<div style="height:${Math.max(6,(c/max)*100)}%" title="${c}"></div>`).join('');
+  const totalLogged = counts.reduce((a,b)=>a+b,0);
+  document.getElementById('sparkLabel').textContent = `${totalLogged} logged in the last 7 days`;
 }
 
-function renderFollowups(){
-  const rows = document.getElementById('followupsRows');
-  const list = filtered().map(c=>({...c, _status: statusOf(c)}))
-    .filter(c=>c._status==='Overdue' || c._status==='Due' || c._status==='Upcoming')
-    .sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
-
-  document.getElementById('followupsEmpty').style.display = list.length ? 'none' : 'block';
-
-  rows.innerHTML = list.map(c => `
-    <tr>
-      <td><strong>${esc(c.name)}</strong><div class="company">${esc(c.company||'')}</div></td>
-      <td>${esc(c.channel)}</td>
-      <td>${c.date_sent}</td>
-      <td>${c.follow_up_date}</td>
-      <td>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <select class="stage-select ${badgeClass(c._status)}" data-id="${c.id}">
-            <option value="Sent" ${c.status!=='Replied'&&c.status!=='Closed'?'selected':''}>${c._status==='Overdue'||c._status==='Due'?c._status:'Active'}</option>
-            <option value="Replied" ${c.status==='Replied'?'selected':''}>Replied</option>
-            <option value="Closed" ${c.status==='Closed'?'selected':''}>Closed</option>
-          </select>
-          ${c.status!=='Replied' && c.status!=='Closed' ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
-        </div>
-      </td>
-      <td style="color: var(--muted); font-size: 0.8rem; padding-top: 14px;">${esc(c.notes || '—')}</td>
-      <td>
-        <div class="next-step-cell ${c.next_step?'':'empty'}" data-act="editns" data-id="${c.id}">${esc(c.next_step || 'Click to add…')}</div>
-      </td>
-    </tr>`).join('');
-
-  rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
-    const act = sel.value==='Replied' ? 'reply' : sel.value==='Closed' ? 'close' : 'reopen';
-    handleAction(act, sel.dataset.id);
-  });
-  rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
-  rows.querySelectorAll('.next-step-cell').forEach(el=>el.onclick=()=>openNsModal(el.dataset.id));
+function renderAll(){
+  renderFuStats();
+  renderTabs();
+  renderTable();
+  renderToday();
+  renderInsights();
 }
 
-function renderAll(){ renderFuStats(); renderFollowups(); renderToday(); renderFuInsights(); }
-
-function flashRow(id){
-  document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
-    const row = el.closest('tr') || el.closest('.today-item');
-    if(!row) return;
-    row.style.transition = 'background-color .15s';
-    row.style.backgroundColor = 'var(--teal-glow)';
-    setTimeout(()=>{ row.style.backgroundColor = ''; }, 700);
-  });
-}
-
+/* ---------- Actions ---------- */
 function showToast(msg, isError){
-  let t = document.getElementById('toast');
-  if(!t){
-    t = document.createElement('div');
-    t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;font-size:.85rem;z-index:100;transition:opacity .3s;';
-    document.body.appendChild(t);
-  }
+  let t = document.querySelector('.toast');
+  if(!t){ t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
   t.textContent = msg;
   t.style.background = isError ? 'var(--danger)' : 'var(--teal)';
   t.style.color = '#04201d';
   t.style.opacity = '1';
   clearTimeout(t._hideTimer);
-  t._hideTimer = setTimeout(()=>{ t.style.opacity='0'; }, 2200);
+  t._hideTimer = setTimeout(()=>{ t.style.opacity = '0'; }, 2200);
 }
 
-async function handleAction(act,id){
+async function handleAction(act, id){
   if(!supa) return;
   let result;
   if(act==='reply') result = await supa.from('contacts').update({status:'Replied'}).eq('id', id);
-  if(act==='close') result = await supa.from('contacts').update({status:'Closed'}).eq('id', id);
+  if(act==='won') result = await supa.from('contacts').update({status:'Won'}).eq('id', id);
+  if(act==='lost') result = await supa.from('contacts').update({status:'Lost'}).eq('id', id);
+  if(act==='meeting') result = await supa.from('contacts').update({status:'Meeting Booked'}).eq('id', id);
   if(act==='reopen') result = await supa.from('contacts').update({status:'Sent'}).eq('id', id);
-  if(act==='followup'){
-    const t = todayStr();
-    result = await supa.from('contacts').update({date_sent:t, follow_up_date:addDays(t,3), status:'Sent'}).eq('id', id);
-  }
   if(result && result.error){ console.error(result.error); showToast('Something went wrong', true); return; }
-  let msg = {reply:'Marked as replied', close:'Closed', reopen:'Reopened'}[act] || 'Updated';
-  if(act==='followup') msg = `Logged, next follow-up ${addDays(todayStr(),3)}`;
-  showToast(msg);
+  showToast({reply:'Marked as replied', won:'Marked as won', lost:'Marked as lost', meeting:'Meeting booked', reopen:'Reopened'}[act] || 'Updated');
   await loadContacts(); renderAll();
-  flashRow(id);
 }
 
-document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
+/* ---------- Log follow-up modal ---------- */
+let logContactId = null;
+function openLogModal(id){
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+  logContactId = id;
+  document.getElementById('logWho').textContent = `${c.name}${c.company ? ' · ' + c.company : ''}`;
+  document.getElementById('log_date').value = todayStr();
+  document.getElementById('log_next').value = '3';
+  document.getElementById('log_note').value = '';
+  document.getElementById('logModalOverlay').classList.add('open');
+  syncQuickDays();
+}
+function closeLogModal(){
+  document.getElementById('logModalOverlay').classList.remove('open');
+  logContactId = null;
+}
+document.getElementById('closeLogModal').addEventListener('click', closeLogModal);
+document.getElementById('cancelLogBtn').addEventListener('click', closeLogModal);
+document.getElementById('logModalOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'logModalOverlay') closeLogModal();
+});
+function syncQuickDays(){
+  const dateVal = document.getElementById('log_date').value;
+  const today = todayStr();
+  document.querySelectorAll('#quickDays button').forEach(b=>{
+    const offset = Number(b.dataset.quick);
+    const target = addDays(today, -offset);
+    b.classList.toggle('active', target === dateVal);
+  });
+}
+document.querySelectorAll('#quickDays button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.getElementById('log_date').value = addDays(todayStr(), -Number(b.dataset.quick));
+    syncQuickDays();
+  });
+});
+document.getElementById('log_date').addEventListener('change', syncQuickDays);
+document.getElementById('logForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!supa || !logContactId) return;
+  const c = contacts.find(x=>x.id===logContactId);
+  if(!c) return;
+  const followedUpOn = document.getElementById('log_date').value || todayStr();
+  const nextIn = Number(document.getElementById('log_next').value) || 3;
+  const note = document.getElementById('log_note').value.trim();
 
+  const update = {
+    last_follow_up: followedUpOn,
+    follow_up_date: addDays(followedUpOn, nextIn),
+    status: 'Sent',
+  };
+  if(note){
+    const existing = c.notes ? c.notes + '\n' : '';
+    update.notes = existing + `[${followedUpOn}] ${note}`;
+  }
+
+  const { error } = await supa.from('contacts').update(update).eq('id', logContactId);
+  if(error){ console.error(error); showToast('Could not log follow-up', true); return; }
+  showToast(`Logged — next follow-up ${humanDate(update.follow_up_date)}`);
+  closeLogModal();
+  await loadContacts(); renderAll();
+});
+
+/* ---------- Next step modal ---------- */
 let nsContactId = null;
 function openNsModal(id){
   const c = contacts.find(x=>x.id===id);
   if(!c) return;
   nsContactId = id;
-  document.getElementById('ns_title').textContent = `Next step — ${c.name}`;
+  document.getElementById('nsWho').textContent = `${c.name}${c.company ? ' · ' + c.company : ''}`;
   document.getElementById('ns_text').value = c.next_step || '';
   document.getElementById('nsModalOverlay').classList.add('open');
   document.getElementById('ns_text').focus();
@@ -410,8 +776,9 @@ function closeNsModal(){
   nsContactId = null;
 }
 document.getElementById('closeNsModal').addEventListener('click', closeNsModal);
+document.getElementById('cancelNsBtn').addEventListener('click', closeNsModal);
 document.getElementById('nsModalOverlay').addEventListener('click', e=>{
-  if(e.target.id==='nsModalOverlay') closeNsModal();
+  if(e.target.id === 'nsModalOverlay') closeNsModal();
 });
 document.getElementById('nsForm').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -424,12 +791,32 @@ document.getElementById('nsForm').addEventListener('submit', async e=>{
   await loadContacts(); renderAll();
 });
 
+/* ---------- Toolbar ---------- */
+document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; page = 1; renderTable(); });
+document.getElementById('channelFilt').addEventListener('change', e=>{ channelFilter = e.target.value; page = 1; renderTable(); });
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  query = ''; channelFilter = ''; activeTab = 'all'; page = 1;
+  document.getElementById('searchBox').value = '';
+  document.getElementById('channelFilt').value = '';
+  renderAll();
+});
+
 (async function init(){
   if(!configured){
     document.getElementById('setupMsg').style.display = 'block';
     return;
   }
   await loadContacts();
+  const params = new URLSearchParams(location.search);
+  const focusId = params.get('contact');
+  if(focusId){
+    const c = contacts.find(x=>x.id===focusId);
+    if(c){
+      query = c.name;
+      activeTab = 'all';
+      document.getElementById('searchBox').value = c.name;
+    }
+  }
   renderAll();
 })();
 </script>

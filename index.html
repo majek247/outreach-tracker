@@ -165,7 +165,7 @@
     <div class="tabs" id="tabs"></div>
     <div class="panel table-scroll" style="padding:6px 8px;">
       <table>
-        <thead><tr><th>Company / Contact</th><th>Channel</th><th>Stage</th><th>Last activity</th><th>Next step</th><th>Notes</th><th></th></tr></thead>
+        <thead><tr><th>Company / Contact</th><th>Channel</th><th>Stage</th><th></th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
       <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
@@ -216,7 +216,7 @@ let contacts = [];
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function addDays(dateStr, n){ const d = new Date(dateStr); d.setDate(d.getDate()+Number(n)); return d.toISOString().slice(0,10); }
 function statusOf(c){
-  if(c.status === 'Replied' || c.status === 'Closed') return c.status;
+  if(['Replied','Won','Lost'].includes(c.status)) return c.status;
   const today = todayStr();
   if(c.follow_up_date < today) return 'Overdue';
   if(c.follow_up_date === today) return 'Due';
@@ -242,7 +242,7 @@ function filtered(){
 
 function renderStats(){
   const list = filtered();
-  const active = list.filter(c=>c.status!=='Replied' && c.status!=='Closed');
+  const active = list.filter(c=>!['Replied','Won','Lost'].includes(c.status));
   const replied = list.filter(c=>c.status==='Replied').length;
   const rate = list.length ? Math.round(replied/list.length*100) : 0;
   const cards = [['Total Contacts', list.length],['Active', active.length],['Replies', replied],['Reply Rate', rate+'%']];
@@ -255,7 +255,7 @@ function renderStats(){
 }
 
 function renderTabs(){
-  const tabs = [['active','Active'],['Overdue','Overdue'],['Due','Due today'],['Replied','Replied'],['Closed','Closed'],['all','All']];
+  const tabs = [['active','Active'],['Meeting Booked','Meeting'],['Replied','Replied'],['Won','Won'],['Lost','Lost'],['all','All']];
   document.getElementById('tabs').innerHTML = tabs.map(([key,label])=>
     `<div class="tab ${filter===key?'active':''}" data-f="${key}">${label}</div>`).join('');
   document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f; renderRows();renderTabs();});
@@ -263,7 +263,7 @@ function renderTabs(){
 
 function renderRows(){
   let list = filtered().map(c=>({...c, _status: statusOf(c)}));
-  if(filter==='active') list = list.filter(c=>c._status!=='Replied' && c._status!=='Closed');
+  if(filter==='active') list = list.filter(c=>!['Replied','Won','Lost'].includes(c._status));
   else if(filter!=='all') list = list.filter(c=>c._status===filter);
   list.sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
 
@@ -272,27 +272,26 @@ function renderRows(){
 
   rows.innerHTML = list.map(c => `
     <tr>
-      <td><strong>${esc(c.company||c.name)}</strong><div class="company">${esc(c.name)}</div></td>
+      <td><a href="followups.html?contact=${c.id}" style="text-decoration:none;color:inherit;"><strong>${esc(c.company||c.name)}</strong><div class="company">${esc(c.name)}</div></a></td>
       <td>${esc(c.channel)}</td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           <select class="stage-select ${badgeClass(c._status)}" data-id="${c.id}">
-            <option value="Sent" ${c.status!=='Replied'&&c.status!=='Closed'?'selected':''}>${c._status==='Overdue'||c._status==='Due'?c._status:'Active'}</option>
+            <option value="Sent" ${!['Replied','Meeting Booked','Won','Lost'].includes(c.status)?'selected':''}>${c._status==='Overdue'||c._status==='Due'?c._status:'Active'}</option>
+            <option value="Meeting Booked" ${c.status==='Meeting Booked'?'selected':''}>Meeting Booked</option>
             <option value="Replied" ${c.status==='Replied'?'selected':''}>Replied</option>
-            <option value="Closed" ${c.status==='Closed'?'selected':''}>Closed</option>
+            <option value="Won" ${c.status==='Won'?'selected':''}>Won</option>
+            <option value="Lost" ${c.status==='Lost'?'selected':''}>Lost</option>
           </select>
-          ${c.status!=='Replied' && c.status!=='Closed' ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
+          ${!['Replied','Won','Lost'].includes(c.status) ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
         </div>
       </td>
-      <td>${c.date_sent}</td>
-      <td>${c.follow_up_date}</td>
-      <td>${esc(c.notes||'')}</td>
       <td><div class="actions">
         <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
       </div></td>
     </tr>`).join('');
   rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
-    const act = sel.value==='Replied' ? 'reply' : sel.value==='Closed' ? 'close' : 'reopen';
+    const act = sel.value==='Replied' ? 'reply' : sel.value==='Won' ? 'won' : sel.value==='Lost' ? 'lost' : sel.value==='Meeting Booked' ? 'meeting' : 'reopen';
     handleAction(act, sel.dataset.id);
   });
   rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
@@ -335,7 +334,9 @@ async function handleAction(act,id){
   }
   let result;
   if(act==='reply') result = await supa.from('contacts').update({status:'Replied'}).eq('id', id);
-  if(act==='close') result = await supa.from('contacts').update({status:'Closed'}).eq('id', id);
+  if(act==='won') result = await supa.from('contacts').update({status:'Won'}).eq('id', id);
+  if(act==='lost') result = await supa.from('contacts').update({status:'Lost'}).eq('id', id);
+  if(act==='meeting') result = await supa.from('contacts').update({status:'Meeting Booked'}).eq('id', id);
   if(act==='reopen') result = await supa.from('contacts').update({status:'Sent'}).eq('id', id);
   if(act==='del') result = await supa.from('contacts').delete().eq('id', id);
   if(act==='followup'){
@@ -347,7 +348,7 @@ async function handleAction(act,id){
     showToast('Something went wrong, check console', true);
     return;
   }
-  let msg = {reply:'Marked as replied', close:'Closed', reopen:'Reopened', del:'Deleted'}[act] || 'Updated';
+  let msg = {reply:'Marked as replied', won:'Marked as won', lost:'Marked as lost', meeting:'Meeting booked', reopen:'Reopened', del:'Deleted'}[act] || 'Updated';
   if(act==='followup') msg = `Logged, next follow-up ${addDays(todayStr(),3)}`;
   showToast(msg);
   await loadContacts(); renderAll();
