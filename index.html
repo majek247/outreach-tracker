@@ -11,7 +11,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    /* Sidebar */
     --sidebar-bg: #0a2422;
     --sidebar-border: #123634;
     --sidebar-text: #8fada9;
@@ -19,7 +18,6 @@
     --sidebar-active-bg: #123634;
     --sidebar-active-text: #ffffff;
 
-    /* Canvas — same dark ground as the sidebar */
     --bg: #0a2422;
     --card: #0f2f2c;
     --border: rgba(255,255,255,0.08);
@@ -29,7 +27,6 @@
     --muted-dim: #6d8681;
     --divider: rgba(255,255,255,0.14);
 
-    /* Brand accent */
     --teal: #1c8384;
     --teal-hover: #23a1a1;
     --teal-accent: #3fc2bc;
@@ -140,6 +137,10 @@
   .actions{display:flex;gap:8px;flex-wrap:wrap;}
   .empty{text-align:center;color:var(--muted-dim);padding:44px 0;font-size:.88rem;}
 
+  /* Clickable contact link */
+  .contact-link { cursor: pointer; transition: color .15s; }
+  .contact-link:hover strong { color: var(--teal-accent); }
+
   /* --- Forms & buttons --- */
   .row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
   .row > div{flex:1;min-width:130px;}
@@ -163,16 +164,15 @@
 
   .btn-new{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 
-.stage-select{
+  .stage-select{
     padding:7px 12px;border-radius:7px;font-size:.76rem;font-weight:600;
     border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text);outline:none;
-}
-.stage-select.overdue{color:var(--danger);}
-.stage-select.due{color:var(--warn);}
-.stage-select.upcoming{color:var(--muted);}
-.stage-select.replied{color:var(--ok);}
-.stage-select.closed{color:var(--muted-dim);}
-
+  }
+  .stage-select.overdue{color:var(--danger);}
+  .stage-select.due{color:var(--warn);}
+  .stage-select.upcoming{color:var(--muted);}
+  .stage-select.replied{color:var(--ok);}
+  .stage-select.closed{color:var(--muted-dim);}
 
   /* --- Modal --- */
   .modal-overlay{display:none;position:fixed;inset:0;background:#0b1615b3;backdrop-filter:blur(3px);z-index:50;align-items:center;justify-content:center;padding:20px;}
@@ -182,6 +182,80 @@
   .modal-head h2{font-size:1.1rem;margin:0;color: var(--text);font-weight: 700;}
   .modal-close{background:transparent;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;padding:2px 8px;line-height:1;transition: .15s;border-radius:6px;}
   .modal-close:hover { color: var(--text); background:var(--bg); }
+
+  /* --- Slide-out Drawer --- */
+  .drawer-overlay{
+    display:none; position:fixed; inset:0;
+    background: rgba(11, 22, 21, 0.55);
+    backdrop-filter: blur(2px);
+    z-index:60;
+    justify-content: flex-end;
+  }
+  .drawer-overlay.open{ display:flex; }
+  .drawer{
+    background: var(--card);
+    border-left: 1px solid var(--border);
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.35);
+    animation: slideIn 0.25s ease-out;
+  }
+  @keyframes slideIn{
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  .drawer-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .drawer-head h2{
+    font-size: 1.05rem; margin: 0; color: var(--text);
+    font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    padding-right: 12px;
+  }
+  .drawer-body{
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .detail-group label{
+    display:block; font-size:.68rem; color: var(--muted-dim);
+    text-transform: uppercase; letter-spacing: 0.06em;
+    margin-bottom: 6px; font-weight: 700;
+  }
+  .detail-group p{
+    margin: 0; font-size: .9rem; color: var(--text); line-height: 1.5;
+  }
+  .detail-group .message-box{
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: .86rem;
+    color: var(--text);
+    white-space: pre-wrap;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  .drawer-footer{
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px){
+    .sidebar{ display: none; }
+    .main{ padding: 20px 16px 40px; }
+    .drawer{ max-width: 100%; }
+  }
 </style>
 </head>
 <body>
@@ -266,17 +340,81 @@
             <div><label>Follow up in (days)</label><input type="number" id="f_days" value="3" min="1"></div>
             <div><label>Notes</label><input id="f_notes" placeholder="e.g. found via LinkedIn search"></div>
           </div>
+          <div class="row">
+            <div style="flex: 100%;">
+              <label>Message Sent</label>
+              <textarea id="f_message" rows="3" placeholder="Paste the exact message you sent here..."></textarea>
+            </div>
+          </div>
           <button type="submit" id="addBtn" style="width: 100%; margin-top: 12px; padding: 12px;">Add contact</button>
         </form>
       </div>
     </div>
 
+
+
+<div class="modal-overlay" id="editModalOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Edit Contact</h2>
+      <button type="button" class="modal-close" id="closeEditModal">&times;</button>
+    </div>
+    <form id="editForm">
+      <input type="hidden" id="e_id">
+      <div class="row">
+        <div><label>Name</label><input id="e_name" required></div>
+        <div><label>Company</label><input id="e_company"></div>
+      </div>
+      <div class="row">
+        <div><label>Channel</label>
+          <select id="e_channel">
+            <option>LinkedIn</option><option>Email</option><option>Cold Call</option><option>Other</option>
+          </select>
+        </div>
+        <div><label>Date sent</label><input type="date" id="e_dateSent" required></div>
+      </div>
+      <div class="row">
+        <div><label>Follow-up date</label><input type="date" id="e_followUp" required></div>
+      </div>
+      <div class="row">
+        <div style="flex:100%;">
+          <label>Message Sent</label>
+          <textarea id="e_message" rows="4" placeholder="The exact message you sent..."></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:100%;">
+          <label>Notes</label>
+          <textarea id="e_notes" rows="2" placeholder="Internal notes..."></textarea>
+        </div>
+      </div>
+      <button type="submit" class="primary" style="width:100%; margin-top:12px; padding:12px;">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+
+
+
   </main>
+</div>
+
+<!-- Slide-out Drawer for Contact Details -->
+<div class="drawer-overlay" id="drawerOverlay">
+  <div class="drawer" id="detailDrawer">
+    <div class="drawer-head">
+      <h2 id="drawerTitle">Contact Details</h2>
+      <button type="button" class="modal-close" id="closeDrawer">&times;</button>
+    </div>
+    <div class="drawer-body" id="drawerContent">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
 </div>
 
 <script>
 // ---- 1. Fill these in from your Supabase project (Settings > API) ----
-const SUPABASE_URL = 'https://qnacdxoxqnpveeeglhnd.supabase.co'; 
+const SUPABASE_URL = 'https://qnacdxoxqnpveeeglhnd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYWNkeG94cW5wdmVlZWdsaG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNTc4NjUsImV4cCI6MjEwNTczMzg2NX0.0H45NYEFSB5ENsXJwQ4ptM06Nk6l4vGx7L3euCCLKPo';
 // ------------------------------------------------------------------
 
@@ -353,7 +491,12 @@ function renderRows(){
 
   rows.innerHTML = list.map(c => `
     <tr>
-      <td><a href="followups.html?contact=${c.id}" style="text-decoration:none;color:inherit;"><strong>${esc(c.company||c.name)}</strong><div class="company">${esc(c.name)}</div></a></td>
+      <td>
+        <a href="#" class="contact-link" data-id="${c.id}">
+          <strong>${esc(c.company||c.name)}</strong>
+          <div class="company">${esc(c.name)}</div>
+        </a>
+      </td>
       <td>${esc(c.channel)}</td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -371,11 +514,20 @@ function renderRows(){
         <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
       </div></td>
     </tr>`).join('');
+
   rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
     const act = sel.value==='Replied' ? 'reply' : sel.value==='Won' ? 'won' : sel.value==='Lost' ? 'lost' : sel.value==='Meeting Booked' ? 'meeting' : 'reopen';
     handleAction(act, sel.dataset.id);
   });
   rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+
+  // Attach drawer open listeners
+  rows.querySelectorAll('.contact-link').forEach(link=>{
+    link.onclick = (e)=>{
+      e.preventDefault();
+      openDrawer(link.dataset.id);
+    };
+  });
 }
 
 function renderAll(){ renderStats(); renderTabs(); renderRows(); }
@@ -436,11 +588,154 @@ async function handleAction(act,id){
   flashRow(id);
 }
 
+
+
+// ============================================
+// EDIT CONTACT MODAL
+// ============================================
+function openEditModal(contact){
+  document.getElementById('e_id').value = contact.id;
+  document.getElementById('e_name').value = contact.name || '';
+  document.getElementById('e_company').value = contact.company || '';
+  document.getElementById('e_channel').value = contact.channel || 'LinkedIn';
+  document.getElementById('e_dateSent').value = contact.date_sent || todayStr();
+  document.getElementById('e_followUp').value = contact.follow_up_date || todayStr();
+  document.getElementById('e_message').value = contact.message || '';
+  document.getElementById('e_notes').value = contact.notes || '';
+
+  // Close the drawer first so the edit modal is fully visible
+  closeDrawer();
+
+  document.getElementById('editModalOverlay').classList.add('open');
+}
+
+function closeEditModal(){
+  document.getElementById('editModalOverlay').classList.remove('open');
+}
+
+document.getElementById('closeEditModal').addEventListener('click', closeEditModal);
+document.getElementById('editModalOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'editModalOverlay') closeEditModal();
+});
+
+document.getElementById('editForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!supa) return;
+
+  const id = document.getElementById('e_id').value;
+  const updates = {
+    name: document.getElementById('e_name').value.trim(),
+    company: document.getElementById('e_company').value.trim(),
+    channel: document.getElementById('e_channel').value,
+    date_sent: document.getElementById('e_dateSent').value,
+    follow_up_date: document.getElementById('e_followUp').value,
+    message: document.getElementById('e_message').value.trim(),
+    notes: document.getElementById('e_notes').value.trim(),
+  };
+
+  const { error } = await supa.from('contacts').update(updates).eq('id', id);
+  if(error){
+    console.error(error);
+    showToast('Could not save changes', true);
+    return;
+  }
+
+  showToast('Contact updated');
+  await loadContacts();
+  closeEditModal();
+  closeDrawer();
+  renderAll();
+});
+// ============================================
+
+
+
+// --- Drawer Logic ---
+const drawerOverlay = document.getElementById('drawerOverlay');
+const drawerContent = document.getElementById('drawerContent');
+const drawerTitle = document.getElementById('drawerTitle');
+
+function openDrawer(contactId){
+  const c = contacts.find(x => x.id === contactId);
+  if(!c) return;
+
+  drawerTitle.textContent = c.company || c.name;
+
+  const status = statusOf(c);
+  const statusColor =
+    status === 'Overdue' ? 'var(--danger)' :
+    status === 'Due' ? 'var(--warn)' :
+    status === 'Replied' ? 'var(--ok)' :
+    status === 'Won' ? 'var(--ok)' :
+    status === 'Lost' ? 'var(--muted-dim)' :
+    'var(--muted)';
+
+  drawerContent.innerHTML = `
+    <div class="detail-group">
+      <label>Contact Person</label>
+      <p>${esc(c.name)}</p>
+    </div>
+    <div class="detail-group">
+      <label>Company</label>
+      <p>${esc(c.company || '—')}</p>
+    </div>
+    <div class="detail-group">
+      <label>Channel</label>
+      <p>${esc(c.channel)}</p>
+    </div>
+    <div class="detail-group">
+      <label>Status</label>
+      <p style="color:${statusColor}; font-weight:600;">${esc(status)}</p>
+    </div>
+    <div class="detail-group">
+      <label>Date Sent</label>
+      <p>${esc(c.date_sent)}</p>
+    </div>
+    <div class="detail-group">
+      <label>Next Follow-up</label>
+      <p>${esc(c.follow_up_date)}</p>
+    </div>
+    <div class="detail-group">
+      <label>Message Sent</label>
+      <div class="message-box">${esc(c.message || 'No message recorded for this contact.')}</div>
+    </div>
+    <div class="detail-group">
+      <label>Notes</label>
+      <p>${esc(c.notes || 'No notes.')}</p>
+    </div>
+
+<div class="drawer-footer" style="display:flex; gap:10px; flex-wrap:wrap;">
+  <button type="button" class="ghost" id="drawerEditBtn" style="flex:1;">Edit Details</button>
+  <a href="followups.html?contact=${c.id}" class="btn-new" style="display:inline-flex; text-decoration:none; flex:1; justify-content:center;">Follow-up History</a>
+</div>
+
+  `;
+
+document.getElementById('drawerEditBtn').onclick = () => openEditModal(c);
+  drawerOverlay.classList.add('open');
+}
+
+function closeDrawer(){
+  drawerOverlay.classList.remove('open');
+}
+
+document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+drawerOverlay.addEventListener('click', (e)=>{
+  if(e.target === drawerOverlay) closeDrawer();
+});
+
+// Close drawer with Escape key
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && drawerOverlay.classList.contains('open')) closeDrawer();
+});
+
+// --- Add Form ---
 document.getElementById('addForm').addEventListener('submit', async e=>{
   e.preventDefault();
   if(!supa) return;
   const dateSent = document.getElementById('f_dateSent').value || todayStr();
   const days = document.getElementById('f_days').value || 3;
+
   const row = {
     id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
     name: document.getElementById('f_name').value.trim(),
@@ -449,8 +744,10 @@ document.getElementById('addForm').addEventListener('submit', async e=>{
     date_sent: dateSent,
     follow_up_date: addDays(dateSent, days),
     notes: document.getElementById('f_notes').value.trim(),
+    message: document.getElementById('f_message').value.trim(),
     status: 'Sent'
   };
+
   const { error } = await supa.from('contacts').insert([row]);
   if(error){ console.error(error); alert('Could not save — check the console and your Supabase setup.'); return; }
   await loadContacts(); renderAll();
