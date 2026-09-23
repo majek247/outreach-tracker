@@ -95,6 +95,17 @@
   .week-item .who b{font-weight:600;}
   .week-item .date{font-size:.7rem;color:var(--muted-dim);flex-shrink:0;}
   .week-empty{color:var(--muted-dim);font-size:.8rem;padding:8px 0;}
+  .fu-group{margin-bottom:18px;}
+  .fu-group:last-child{margin-bottom:0;}
+  .fu-group-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px;}
+  .fu-group-title span{color:var(--muted-dim);font-weight:500;text-transform:none;letter-spacing:0;}
+  .fu-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--card2);border:1px solid var(--border-soft);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .fu-who{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .fu-who b{font-size:.9rem;}
+  .fu-company{font-size:.76rem;color:var(--muted);}
+  .fu-meta{font-size:.7rem;color:var(--muted-dim);}
+  .fu-notes{font-size:.72rem;color:var(--muted-dim);font-style:italic;}
+  .fu-actions{display:flex;gap:6px;flex-shrink:0;}
 
   form.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:18px;scroll-margin-top:20px;}
   .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
@@ -159,7 +170,7 @@
       <a href="#" data-view="outreach">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         Outreach</a>
-      <a href="#" data-view="outreach" data-anchor="week">
+      <a href="#" data-view="followups">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
         Follow-ups</a>
       <a href="#" data-view="outreach" data-anchor="funnel">
@@ -229,6 +240,14 @@
         <h2>This Week</h2>
         <div class="sub">Follow-ups due in the next 7 days</div>
         <div id="weekBody"></div>
+      </div>
+    </div>
+
+    <div class="view" id="view-followups">
+      <div class="panel">
+        <h2>Follow-ups</h2>
+        <div class="sub">Grouped by urgency, work top to bottom</div>
+        <div id="followupsBody"></div>
       </div>
     </div>
 
@@ -350,6 +369,42 @@ function renderWeek(){
   body.querySelectorAll('input').forEach(cb=>cb.onchange=()=>handleAction('followup', cb.dataset.id));
 }
 
+function renderFollowups(){
+  const body = document.getElementById('followupsBody');
+  if(!body) return;
+  const list = filtered().map(c=>({...c, _status: statusOf(c)}))
+    .filter(c=>c._status==='Overdue' || c._status==='Due' || c._status==='Upcoming');
+
+  if(!list.length){ body.innerHTML = '<div class="week-empty">Nothing to follow up on — you are all caught up.</div>'; return; }
+
+  const groups = [
+    ['Overdue', list.filter(c=>c._status==='Overdue').sort((a,b)=>a.follow_up_date.localeCompare(b.follow_up_date))],
+    ['Due today', list.filter(c=>c._status==='Due')],
+    ['Upcoming', list.filter(c=>c._status==='Upcoming').sort((a,b)=>a.follow_up_date.localeCompare(b.follow_up_date))]
+  ].filter(([,items])=>items.length);
+
+  body.innerHTML = groups.map(([label,items])=>`
+    <div class="fu-group">
+      <div class="fu-group-title">${label} <span>(${items.length})</span></div>
+      ${items.map(c=>`
+        <div class="fu-item">
+          <div class="fu-who">
+            <b>${esc(c.name)}</b>
+            <span class="fu-company">${esc(c.company||'')}</span>
+            <span class="fu-meta">${esc(c.channel)} · due ${c.follow_up_date}</span>
+            ${c.notes ? `<span class="fu-notes">${esc(c.notes)}</span>` : ''}
+          </div>
+          <div class="fu-actions">
+            <button class="ghost" data-act="followup" data-id="${c.id}">Followed up</button>
+            <button class="ghost" data-act="reply" data-id="${c.id}">Replied</button>
+            <button class="ghost" data-act="close" data-id="${c.id}">Close</button>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  body.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+}
+
 function renderTabs(){
   const tabs = [['active','Active'],['Overdue','Overdue'],['Due','Due today'],['Replied','Replied'],['Closed','Closed'],['all','All']];
   document.getElementById('tabs').innerHTML = tabs.map(([key,label])=>
@@ -389,14 +444,19 @@ function renderRows(){
   rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
     const act = sel.value==='Replied' ? 'reply' : sel.value==='Closed' ? 'close' : 'reopen';
     handleAction(act, sel.dataset.id);
+
   });
   rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
 }
 
-function renderAll(){ renderStats(); renderBars(); renderFunnel(); renderWeek(); renderTabs(); renderRows(); }
-
+function renderAll(){ renderStats(); renderBars(); renderFunnel(); renderWeek(); renderFollowups(); renderTabs(); renderRows(); }
 async function handleAction(act,id){
   if(!supa) return;
+  if(act==='del'){
+    const c = contacts.find(x=>x.id===id);
+    const label = c ? (c.name + (c.company ? ' — '+c.company : '')) : 'this contact';
+    if(!confirm(`Delete ${label}? This can't be undone.`)) return;
+  }
   if(act==='reply') await supa.from('contacts').update({status:'Replied'}).eq('id', id);
   if(act==='close') await supa.from('contacts').update({status:'Closed'}).eq('id', id);
   if(act==='reopen') await supa.from('contacts').update({status:'Sent'}).eq('id', id);
@@ -433,6 +493,19 @@ document.getElementById('addForm').addEventListener('submit', async e=>{
 });
 
 document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
+
+function openAddModal(){
+  document.getElementById('addModalOverlay').classList.add('open');
+  document.getElementById('f_name').focus();
+}
+function closeAddModal(){
+  document.getElementById('addModalOverlay').classList.remove('open');
+}
+document.getElementById('openAddModal').addEventListener('click', openAddModal);
+document.getElementById('closeAddModal').addEventListener('click', closeAddModal);
+document.getElementById('addModalOverlay').addEventListener('click', e=>{
+  if(e.target.id==='addModalOverlay') closeAddModal();
+});
 
 document.querySelectorAll('nav a[data-view]').forEach(a=>{
   a.addEventListener('click', (e)=>{
