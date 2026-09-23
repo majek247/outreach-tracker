@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GrowUp Outreach Tracker</title>
+<title>Follow-ups — GrowUp Outreach Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
@@ -63,40 +63,56 @@
 
   .setup{background:#e0a63d1a;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:.85rem;display:none;}
 
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
-  .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;}
-  .stat .top{display:flex;justify-content:space-between;align-items:flex-start;}
-  .stat .ico{width:30px;height:30px;border-radius:8px;background:var(--teal-glow);display:flex;align-items:center;justify-content:center;}
-  .stat .ico svg{width:15px;height:15px;color:var(--teal);}
-  .stat .n{font-size:1.7rem;font-weight:800;margin-top:10px;}
-  .stat .l{font-size:.75rem;color:var(--muted);margin-top:2px;}
-
+  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
   .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;scroll-margin-top:20px;}
+  .panel h2{font-size:.9rem;margin:0 0 2px;}
+  .panel .sub{font-size:.72rem;color:var(--muted-dim);margin-bottom:14px;}
 
-  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
-  .row > div{flex:1;min-width:130px;}
-  label{display:block;font-size:.68rem;color:var(--muted-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
-  input,select,textarea{
-    width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
-    background:var(--card2);color:var(--text);font-size:.87rem;
+  .fu-group{margin-bottom:18px;}
+  .fu-group:last-child{margin-bottom:0;}
+  .fu-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--card2);border:1px solid var(--border-soft);border-radius:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .fu-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px;}
+  .fu-stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+  .fu-stat .n{font-size:1.5rem;font-weight:800;}
+  .fu-stat.warn .n{color:var(--warn);}
+  .fu-stat.danger .n{color:var(--danger);}
+  .fu-stat.teal .n{color:var(--teal);}
+  .fu-stat.ok .n{color:var(--ok);}
+  .fu-stat .l{font-size:.72rem;color:var(--muted);margin-top:2px;}
+  .today-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:.82rem;}
+  .today-item:last-child{border-bottom:none;}
+  .today-item .who b{font-weight:600;}
+  .today-item .chan{font-size:.7rem;color:var(--muted-dim);}
+  .insights-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-soft);font-size:.85rem;}
+  .insights-row:last-child{border-bottom:none;}
+  .insights-row .v{font-weight:700;font-size:1rem;}
+  .next-step-cell{
+    cursor:pointer; border-radius:8px; padding:6px 10px; transition:.15s;
+    border:1px solid var(--border); background:var(--card2); display:block;
+    width:100%; font-size:.75rem; font-weight:500; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box;
   }
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
+  .next-step-cell:hover{border-color:var(--teal-dim);background:var(--card);}
+  .next-step-cell.empty{color:var(--muted-dim);font-style:italic;}
+  textarea#ns_text{resize:vertical;min-height:80px;font-family:inherit;}
+
   button{background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:10px 18px;font-size:.85rem;cursor:pointer;font-weight:700;}
   button:hover{filter:brightness(1.1);}
-  button:disabled{opacity:.4;cursor:not-allowed;}
   button.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);font-weight:500;padding:5px 10px;font-size:.72rem;}
   button.ghost:hover{color:var(--text);border-color:var(--teal-dim);}
 
-  .tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
-  .tab{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:.76rem;color:var(--muted);cursor:pointer;white-space:nowrap;}
-  .tab.active{background:var(--teal);color:#04201d;border-color:var(--teal);font-weight:700;}
   .table-scroll{overflow-x:auto;}
   table{width:100%;border-collapse:collapse;min-width:680px;}
   th{text-align:left;font-size:.66rem;color:var(--muted-dim);text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--border);}
   td{padding:11px 10px;border-bottom:1px solid var(--border-soft);font-size:.85rem;vertical-align:middle;}
-  th:last-child, td:last-child { width: 200px; min-width: 180px; }
   .company{color:var(--muted);font-size:.74rem;}
-  .actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;display:inline-block;}
+  .badge.overdue{background:#e5654f22;color:var(--danger);}
+  .badge.due{background:#e0a63d22;color:var(--warn);}
+  .badge.upcoming{background:#7fa19c22;color:var(--muted);}
+  .badge.replied{background:#3ecf8e22;color:var(--ok);}
+  .badge.closed{background:#7fa19c22;color:var(--muted-dim);}
   .empty{text-align:center;color:var(--muted-dim);padding:30px 0;font-size:.85rem;}
   .modal-overlay{display:none;position:fixed;inset:0;background:#04100fcc;backdrop-filter:blur(3px);z-index:50;align-items:center;justify-content:center;padding:20px;}
   .modal-overlay.open{display:flex;}
@@ -104,14 +120,18 @@
   .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .modal-head h2{font-size:1.05rem;margin:0;}
   .modal-close{background:transparent;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1;}
-  .btn-new{display:flex;align-items:center;gap:6px;background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:10px 16px;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0;}
-  .btn-new:hover{filter:brightness(1.1);}
   .stage-select{padding:5px 8px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid var(--border);background:var(--card2);cursor:pointer;}
   .stage-select.overdue{color:var(--danger);border-color:var(--danger);}
   .stage-select.due{color:var(--warn);border-color:var(--warn);}
   .stage-select.upcoming{color:var(--muted);}
   .stage-select.replied{color:var(--ok);border-color:var(--ok);}
   .stage-select.closed{color:var(--muted-dim);}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .row > div{flex:1;min-width:130px;}
+  label{display:block;font-size:.68rem;color:var(--muted-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card2);color:var(--text);font-size:.87rem;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
+  .week-empty{color:var(--muted-dim);font-size:.8rem;padding:8px 0;}
 </style>
 </head>
 <body>
@@ -122,20 +142,20 @@
       <div><div class="name">GrowUp</div><div class="tag">Outreach</div></div>
     </div>
     <nav>
-      <a href="index.html" class="active">
+      <a href="index.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
         Dashboard</a>
-      <a href="outreach.html">
+      <a href="index.html#outreach">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         Outreach</a>
-      <a href="followups.html">
+      <a href="followups.html" class="active">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"><path d="M3 9h18M8 3v4M16 3v4"/></svg>
         Follow-ups</a>
     </nav>
     <div class="side-foot">Turn conversations<br>into pipeline.</div>
   </aside>
 
-  <main class="main" id="top">
+  <main class="main">
     <div class="topbar">
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -144,72 +164,69 @@
       <div class="avatar">MJ</div>
     </div>
 
-    <div class="hero" style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-      <div>
-        <h1>Turn Conversations Into Pipeline.</h1>
-        <p>Track. Follow up. Win. A disciplined approach to outreach.</p>
-      </div>
-      <button type="button" class="btn-new" id="openAddModal">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 5v14M5 12h14"/></svg>
-        New outreach
-      </button>
+    <div class="hero">
+      <h1>Follow-ups</h1>
+      <p>Stay on top of every conversation that needs a nudge.</p>
     </div>
 
     <div class="setup" id="setupMsg">
-      Add your Supabase URL and anon key at the top of the &lt;script&gt; block, then run schema.sql in your
-      Supabase SQL editor.
+      Add your Supabase URL and anon key at the top of the &lt;script&gt; block.
     </div>
 
-    <div class="stats" id="stats"></div>
+    <div class="fu-stats" id="fuStats"></div>
 
-    <div class="tabs" id="tabs"></div>
-    <div class="panel table-scroll" style="padding:6px 8px;">
+    <div class="panel table-scroll" style="margin-bottom:14px;padding:6px 8px;">
+      <h2 style="padding:12px 12px 0;">All Follow-ups</h2>
+      <div class="sub" style="padding:0 12px;">Sorted by follow-up date, most urgent first</div>
       <table>
-        <thead><tr><th>Company / Contact</th><th>Channel</th><th>Stage</th><th>Last activity</th><th>Next step</th><th>Notes</th><th></th></tr></thead>
-        <tbody id="rows"></tbody>
+        <thead><tr><th>Contact</th><th>Channel</th><th>Last Outreach</th><th>Follow-up Date</th><th>Status</th><th>Notes</th><th>Next Step</th></tr></thead>
+        <tbody id="followupsRows"></tbody>
       </table>
-      <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
+      <div class="empty" id="followupsEmpty" style="display:none;">Nothing to follow up on — you are all caught up.</div>
     </div>
 
-    <div class="modal-overlay" id="addModalOverlay">
-      <div class="modal" id="add">
-        <div class="modal-head">
-          <h2>New outreach</h2>
-          <button type="button" class="modal-close" id="closeAddModal">&times;</button>
-        </div>
-        <form id="addForm">
-          <div class="row">
-            <div><label>Name</label><input id="f_name" required placeholder="Jane Doe"></div>
-            <div><label>Company</label><input id="f_company" placeholder="Acme Ltd"></div>
-          </div>
-          <div class="row">
-            <div><label>Channel</label>
-              <select id="f_channel"><option>LinkedIn</option><option>Email</option><option>Cold Call</option><option>Other</option></select>
-            </div>
-            <div><label>Date sent</label><input type="date" id="f_dateSent" required></div>
-          </div>
-          <div class="row">
-            <div><label>Follow up in (days)</label><input type="number" id="f_days" value="3" min="1"></div>
-            <div><label>Notes</label><input id="f_notes" placeholder="e.g. found via LinkedIn search"></div>
-          </div>
-          <button type="submit" id="addBtn">Add contact</button>
-        </form>
+    <div class="grid2">
+      <div class="panel">
+        <h2>Today's Follow-ups</h2>
+        <div class="sub">Due today, at a glance</div>
+        <div id="todayBody"></div>
+      </div>
+      <div class="panel">
+        <h2>Follow-up Insights</h2>
+        <div class="sub">How your outreach is performing</div>
+        <div id="fuInsightsBody"></div>
       </div>
     </div>
 
+    <div class="modal-overlay" id="nsModalOverlay">
+      <div class="modal">
+        <div class="modal-head">
+          <h2 id="ns_title">Next step</h2>
+          <button type="button" class="modal-close" id="closeNsModal">&times;</button>
+        </div>
+        <form id="nsForm">
+          <div class="row">
+            <div style="min-width:100%;">
+              <label>What's the next step?</label>
+              <textarea id="ns_text" placeholder="e.g. Book a call, send pricing, share case study…"></textarea>
+            </div>
+          </div>
+          <button type="submit">Save</button>
+        </form>
+      </div>
+    </div>
   </main>
 </div>
 
 <script>
-// ---- 1. Fill these in from your Supabase project (Settings > API) ----
-const SUPABASE_URL = 'https://qnacdxoxqnpveeeglhnd.supabase.co'; 
+// ---- Same Supabase credentials as index.html ----
+const SUPABASE_URL = 'https://qnacdxoxqnpveeeglhnd.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFuYWNkeG94cW5wdmVlZWdsaG5kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNTc4NjUsImV4cCI6MjEwNTczMzg2NX0.0H45NYEFSB5ENsXJwQ4ptM06Nk6l4vGx7L3euCCLKPo';
 // ------------------------------------------------------------------
 
 const configured = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
 const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-let filter = 'active';
 let query = '';
 let contacts = [];
 
@@ -240,40 +257,72 @@ function filtered(){
   });
 }
 
-function renderStats(){
-  const list = filtered();
-  const active = list.filter(c=>c.status!=='Replied' && c.status!=='Closed');
-  const replied = list.filter(c=>c.status==='Replied').length;
-  const rate = list.length ? Math.round(replied/list.length*100) : 0;
-  const cards = [['Total Contacts', list.length],['Active', active.length],['Replies', replied],['Reply Rate', rate+'%']];
-  document.getElementById('stats').innerHTML = cards.map(([l,n])=>`
-    <div class="stat">
-      <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div></div>
-      <div class="n">${n}</div>
-      <div class="l">${l}</div>
+function renderFuStats(){
+  const el = document.getElementById('fuStats');
+  const today = todayStr();
+  const weekEnd = addDays(today, 7);
+  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed');
+  const due = active.filter(c=>c.follow_up_date===today).length;
+  const overdue = active.filter(c=>c.follow_up_date<today).length;
+  const upcoming = active.filter(c=>c.follow_up_date>today && c.follow_up_date<=weekEnd).length;
+  const completed = contacts.filter(c=>c.status==='Replied' || c.status==='Closed').length;
+  const cards = [
+    ['warn', due, 'Due Today'],
+    ['danger', overdue, 'Overdue'],
+    ['teal', upcoming, 'Upcoming (7 days)'],
+    ['ok', completed, 'Completed']
+  ];
+  el.innerHTML = cards.map(([cls,n,l])=>`
+    <div class="fu-stat ${cls}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+}
+
+function renderToday(){
+  const body = document.getElementById('todayBody');
+  const today = todayStr();
+  const due = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed' && c.follow_up_date===today);
+  if(!due.length){ body.innerHTML = '<div class="week-empty">Nothing due today.</div>'; return; }
+  body.innerHTML = due.map(c=>`
+    <div class="today-item">
+      <div class="who"><b>${esc(c.name)}</b> — ${esc(c.company||'')} <div class="chan">${esc(c.channel)}</div></div>
+      <div class="fu-actions">
+        <button class="ghost" data-act="followup" data-id="${c.id}">Followed up</button>
+        <button class="ghost" data-act="reply" data-id="${c.id}">Replied</button>
+      </div>
     </div>`).join('');
+  body.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
 }
 
-function renderTabs(){
-  const tabs = [['active','Active'],['Overdue','Overdue'],['Due','Due today'],['Replied','Replied'],['Closed','Closed'],['all','All']];
-  document.getElementById('tabs').innerHTML = tabs.map(([key,label])=>
-    `<div class="tab ${filter===key?'active':''}" data-f="${key}">${label}</div>`).join('');
-  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f; renderRows();renderTabs();});
+function renderFuInsights(){
+  const body = document.getElementById('fuInsightsBody');
+  const total = contacts.length;
+  const replied = contacts.filter(c=>c.status==='Replied').length;
+  const closed = contacts.filter(c=>c.status==='Closed').length;
+  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed').length;
+  const rate = total ? Math.round(replied/total*100) : 0;
+  const rows = [
+    ['Reply rate', rate+'%'],
+    ['Active conversations', active],
+    ['Replied', replied],
+    ['Closed', closed]
+  ];
+  body.innerHTML = rows.map(([l,v])=>`
+    <div class="insights-row"><span>${l}</span><span class="v">${v}</span></div>`).join('');
 }
 
-function renderRows(){
-  let list = filtered().map(c=>({...c, _status: statusOf(c)}));
-  if(filter==='active') list = list.filter(c=>c._status!=='Replied' && c._status!=='Closed');
-  else if(filter!=='all') list = list.filter(c=>c._status===filter);
-  list.sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
+function renderFollowups(){
+  const rows = document.getElementById('followupsRows');
+  const list = filtered().map(c=>({...c, _status: statusOf(c)}))
+    .filter(c=>c._status==='Overdue' || c._status==='Due' || c._status==='Upcoming')
+    .sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
 
-  const rows = document.getElementById('rows');
-  document.getElementById('emptyMsg').style.display = list.length ? 'none':'block';
+  document.getElementById('followupsEmpty').style.display = list.length ? 'none' : 'block';
 
   rows.innerHTML = list.map(c => `
     <tr>
-      <td><strong>${esc(c.company||c.name)}</strong><div class="company">${esc(c.name)}</div></td>
+      <td><strong>${esc(c.name)}</strong><div class="company">${esc(c.company||'')}</div></td>
       <td>${esc(c.channel)}</td>
+      <td>${c.date_sent}</td>
+      <td>${c.follow_up_date}</td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           <select class="stage-select ${badgeClass(c._status)}" data-id="${c.id}">
@@ -284,25 +333,25 @@ function renderRows(){
           ${c.status!=='Replied' && c.status!=='Closed' ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
         </div>
       </td>
-      <td>${c.date_sent}</td>
-      <td>${c.follow_up_date}</td>
-      <td>${esc(c.notes||'')}</td>
-      <td><div class="actions">
-        <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
-      </div></td>
+      <td style="color: var(--muted); font-size: 0.8rem; padding-top: 14px;">${esc(c.notes || '—')}</td>
+      <td>
+        <div class="next-step-cell ${c.next_step?'':'empty'}" data-act="editns" data-id="${c.id}">${esc(c.next_step || 'Click to add…')}</div>
+      </td>
     </tr>`).join('');
+
   rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
     const act = sel.value==='Replied' ? 'reply' : sel.value==='Closed' ? 'close' : 'reopen';
     handleAction(act, sel.dataset.id);
   });
   rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+  rows.querySelectorAll('.next-step-cell').forEach(el=>el.onclick=()=>openNsModal(el.dataset.id));
 }
 
-function renderAll(){ renderStats(); renderTabs(); renderRows(); }
+function renderAll(){ renderFuStats(); renderFollowups(); renderToday(); renderFuInsights(); }
 
 function flashRow(id){
   document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
-    const row = el.closest('tr');
+    const row = el.closest('tr') || el.closest('.today-item');
     if(!row) return;
     row.style.transition = 'background-color .15s';
     row.style.backgroundColor = 'var(--teal-glow)';
@@ -328,77 +377,56 @@ function showToast(msg, isError){
 
 async function handleAction(act,id){
   if(!supa) return;
-  if(act==='del'){
-    const c = contacts.find(x=>x.id===id);
-    const label = c ? (c.name + (c.company ? ' — '+c.company : '')) : 'this contact';
-    if(!confirm(`Delete ${label}? This can't be undone.`)) return;
-  }
   let result;
   if(act==='reply') result = await supa.from('contacts').update({status:'Replied'}).eq('id', id);
   if(act==='close') result = await supa.from('contacts').update({status:'Closed'}).eq('id', id);
   if(act==='reopen') result = await supa.from('contacts').update({status:'Sent'}).eq('id', id);
-  if(act==='del') result = await supa.from('contacts').delete().eq('id', id);
   if(act==='followup'){
     const t = todayStr();
     result = await supa.from('contacts').update({date_sent:t, follow_up_date:addDays(t,3), status:'Sent'}).eq('id', id);
   }
-  if(result && result.error){
-    console.error('Supabase error:', result.error);
-    showToast('Something went wrong, check console', true);
-    return;
-  }
-  let msg = {reply:'Marked as replied', close:'Closed', reopen:'Reopened', del:'Deleted'}[act] || 'Updated';
+  if(result && result.error){ console.error(result.error); showToast('Something went wrong', true); return; }
+  let msg = {reply:'Marked as replied', close:'Closed', reopen:'Reopened'}[act] || 'Updated';
   if(act==='followup') msg = `Logged, next follow-up ${addDays(todayStr(),3)}`;
   showToast(msg);
   await loadContacts(); renderAll();
   flashRow(id);
 }
 
-document.getElementById('addForm').addEventListener('submit', async e=>{
-  e.preventDefault();
-  if(!supa) return;
-  const dateSent = document.getElementById('f_dateSent').value || todayStr();
-  const days = document.getElementById('f_days').value || 3;
-  const row = {
-    id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
-    name: document.getElementById('f_name').value.trim(),
-    company: document.getElementById('f_company').value.trim(),
-    channel: document.getElementById('f_channel').value,
-    date_sent: dateSent,
-    follow_up_date: addDays(dateSent, days),
-    notes: document.getElementById('f_notes').value.trim(),
-    status: 'Sent'
-  };
-  const { error } = await supa.from('contacts').insert([row]);
-  if(error){ console.error(error); alert('Could not save — check the console and your Supabase setup.'); return; }
-  await loadContacts(); renderAll();
-  e.target.reset();
-  document.getElementById('f_dateSent').value = todayStr();
-  document.getElementById('f_days').value = 3;
-  closeAddModal();
-});
-
 document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
 
-function openAddModal(){
-  document.getElementById('addModalOverlay').classList.add('open');
-  document.getElementById('f_name').focus();
+let nsContactId = null;
+function openNsModal(id){
+  const c = contacts.find(x=>x.id===id);
+  if(!c) return;
+  nsContactId = id;
+  document.getElementById('ns_title').textContent = `Next step — ${c.name}`;
+  document.getElementById('ns_text').value = c.next_step || '';
+  document.getElementById('nsModalOverlay').classList.add('open');
+  document.getElementById('ns_text').focus();
 }
-function closeAddModal(){
-  document.getElementById('addModalOverlay').classList.remove('open');
+function closeNsModal(){
+  document.getElementById('nsModalOverlay').classList.remove('open');
+  nsContactId = null;
 }
-document.getElementById('openAddModal').addEventListener('click', openAddModal);
-document.getElementById('closeAddModal').addEventListener('click', closeAddModal);
-document.getElementById('addModalOverlay').addEventListener('click', e=>{
-  if(e.target.id==='addModalOverlay') closeAddModal();
+document.getElementById('closeNsModal').addEventListener('click', closeNsModal);
+document.getElementById('nsModalOverlay').addEventListener('click', e=>{
+  if(e.target.id==='nsModalOverlay') closeNsModal();
+});
+document.getElementById('nsForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!supa || !nsContactId) return;
+  const val = document.getElementById('ns_text').value.trim();
+  const { error } = await supa.from('contacts').update({next_step: val}).eq('id', nsContactId);
+  if(error){ console.error(error); showToast('Could not save next step', true); return; }
+  showToast('Next step saved');
+  closeNsModal();
+  await loadContacts(); renderAll();
 });
 
 (async function init(){
-  document.getElementById('f_dateSent').value = todayStr();
   if(!configured){
     document.getElementById('setupMsg').style.display = 'block';
-    document.getElementById('addBtn').disabled = true;
-    renderAll();
     return;
   }
   await loadContacts();
