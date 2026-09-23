@@ -3,271 +3,261 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>GrowUp | Outreach Tracker</title>
+<title>GrowUp Outreach Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
-    /* GrowUp Premium Brand Colors */
-    --brand-bg: #081414;
-    --brand-surface: #0E1F1F;
-    --brand-surface-hover: #142C2C;
-    --brand-border: #1A3535;
-    --brand-border-light: #234444;
-    --brand-primary: #1E9A9B;
-    --brand-primary-hover: #25B8B9;
-    --brand-text: #E6F0F0;
-    --brand-muted: #8FA8A8;
-    
-    /* Status Colors */
-    --danger: #E74C3C;
-    --danger-bg: rgba(231, 76, 60, 0.1);
-    --warn: #F1C40F;
-    --warn-bg: rgba(241, 196, 15, 0.1);
-    --ok: #2ECC71;
-    --ok-bg: rgba(46, 204, 113, 0.1);
-    --neutral: #7F8C8D;
-    --neutral-bg: rgba(127, 140, 141, 0.1);
-    
-    box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg:#0a1414; --bg2:#0f1c1c; --card:#122323; --card2:#0d1e1e;
+    --border:#1e3535; --border-soft:#182a2a;
+    --teal:#1fb8ab; --teal-dim:#167273; --teal-glow:#1fb8ab33;
+    --text:#eaf3f2; --muted:#7fa19c; --muted-dim:#4f6b67;
+    --danger:#e5654f; --warn:#e0a63d; --ok:#3ecf8e;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
   }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:20px; scroll-behavior:smooth;}
+  body{
+    margin:0; min-height:100%;
+    background:
+      radial-gradient(1200px 500px at 20% -10%, #14302e 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg2), var(--bg) 400px);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  a{color:inherit;text-decoration:none;}
 
-  /* Force dark mode for the premium feel */
-  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-  * { box-sizing: border-box; }
-  
-  body { 
-    margin: 0; 
-    background: var(--brand-bg); 
-    color: var(--brand-text); 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-    min-height: 100%; 
-    -webkit-font-smoothing: antialiased;
+  .shell{display:flex;min-height:100vh;}
+  .sidebar{
+    width:210px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--border-soft);
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:22px;
   }
-  
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
-  
-  header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: baseline; 
-    flex-wrap: wrap; 
-    gap: 8px; 
-    margin-bottom: 32px; 
-    border-bottom: 1px solid var(--brand-border);
-    padding-bottom: 24px;
+  .brand{display:flex;align-items:center;gap:9px;padding:0 8px;}
+  .brand .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--teal),var(--teal-dim));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#04201d;}
+  .brand .name{font-weight:700;font-size:.95rem;}
+  .brand .tag{font-size:.6rem;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;}
+  nav{display:flex;flex-direction:column;gap:2px;}
+  nav a{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;
+    font-size:.83rem;color:var(--muted);transition:.15s;
   }
-  
-  h1 { font-size: 1.5rem; margin: 0; font-weight: 600; letter-spacing: -0.02em; }
-  .sub { color: var(--brand-muted); font-size: 0.9rem; font-weight: 400; }
-  
-  .setup { 
-    background: var(--warn-bg); 
-    border: 1px solid rgba(241, 196, 15, 0.3); 
-    color: var(--warn); 
-    border-radius: 8px; 
-    padding: 16px 20px; 
-    margin-bottom: 24px; 
-    font-size: 0.85rem; 
-    display: none; 
-    line-height: 1.5;
+  nav a:hover{background:var(--card2);color:var(--text);}
+  nav a.active{background:var(--teal-glow);color:var(--teal);font-weight:600;}
+  nav svg{width:15px;height:15px;flex-shrink:0;}
+  .side-foot{margin-top:auto;font-size:.68rem;color:var(--muted-dim);padding:0 8px;line-height:1.5;}
+
+  .main{flex:1;min-width:0;padding:20px 26px 60px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .search{
+    flex:1;max-width:380px;display:flex;align-items:center;gap:8px;background:var(--card);
+    border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--muted);
   }
-  
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 32px; }
-  .stat { 
-    background: var(--brand-surface); 
-    border: 1px solid var(--brand-border); 
-    border-radius: 12px; 
-    padding: 20px; 
-    transition: border-color 0.2s ease;
+  .search input{background:transparent;border:none;outline:none;color:var(--text);font-size:.85rem;width:100%;}
+  .search svg{width:14px;height:14px;flex-shrink:0;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dim));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#04201d;}
+
+  .hero{margin-bottom:22px;}
+  .hero h1{font-size:1.65rem;margin:0 0 4px;letter-spacing:-.01em;}
+  .hero p{margin:0;color:var(--muted);font-size:.9rem;}
+
+  .setup{background:#e0a63d1a;border:1px solid var(--warn);color:var(--warn);border-radius:10px;padding:12px 14px;margin-bottom:20px;font-size:.85rem;display:none;}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;}
+  .stat .top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .stat .ico{width:30px;height:30px;border-radius:8px;background:var(--teal-glow);display:flex;align-items:center;justify-content:center;}
+  .stat .ico svg{width:15px;height:15px;color:var(--teal);}
+  .stat .n{font-size:1.7rem;font-weight:800;margin-top:10px;}
+  .stat .l{font-size:.75rem;color:var(--muted);margin-top:2px;}
+
+  .grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;scroll-margin-top:20px;}
+  .panel h2{font-size:.9rem;margin:0 0 2px;}
+  .panel .sub{font-size:.72rem;color:var(--muted-dim);margin-bottom:14px;}
+
+  .bars{display:flex;align-items:flex-end;gap:4px;height:110px;}
+  .bars .bar{flex:1;background:linear-gradient(180deg,var(--teal),var(--teal-dim));border-radius:3px 3px 0 0;min-height:2px;}
+  .bars-x{display:flex;gap:4px;margin-top:6px;}
+  .bars-x span{flex:1;text-align:center;font-size:.58rem;color:var(--muted-dim);}
+
+  .funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .funnel-row .lbl{width:64px;font-size:.72rem;color:var(--muted);flex-shrink:0;}
+  .funnel-row .track{flex:1;height:20px;background:var(--card2);border-radius:6px;overflow:hidden;}
+  .funnel-row .fill{height:100%;background:linear-gradient(90deg,var(--teal-dim),var(--teal));border-radius:6px;}
+  .funnel-row .val{width:32px;text-align:right;font-size:.75rem;font-weight:700;flex-shrink:0;}
+
+  .week-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:.82rem;}
+  .week-item:last-child{border-bottom:none;}
+  .week-item input{accent-color:var(--teal);width:15px;height:15px;flex-shrink:0;cursor:pointer;}
+  .week-item .who{flex:1;min-width:0;}
+  .week-item .who b{font-weight:600;}
+  .week-item .date{font-size:.7rem;color:var(--muted-dim);flex-shrink:0;}
+  .week-empty{color:var(--muted-dim);font-size:.8rem;padding:8px 0;}
+
+  form.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:18px;scroll-margin-top:20px;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .row > div{flex:1;min-width:130px;}
+  label{display:block;font-size:.68rem;color:var(--muted-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+  input,select,textarea{
+    width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+    background:var(--card2);color:var(--text);font-size:.87rem;
   }
-  .stat:hover { border-color: var(--brand-border-light); }
-  .stat .n { font-size: 2rem; font-weight: 700; line-height: 1.1; margin-bottom: 4px; letter-spacing: -0.03em; }
-  .stat .l { font-size: 0.75rem; color: var(--brand-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
-  
-  .stat.overdue .n { color: var(--danger); }
-  .stat.due .n { color: var(--warn); }
-  .stat.replied .n { color: var(--ok); }
-  
-  form.card, .card { 
-    background: var(--brand-surface); 
-    border: 1px solid var(--brand-border); 
-    border-radius: 12px; 
-    padding: 24px; 
-    margin-bottom: 24px; 
-  }
-  
-  .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
-  .row > div { flex: 1; min-width: 140px; }
-  
-  label { display: block; font-size: 0.75rem; color: var(--brand-muted); margin-bottom: 8px; font-weight: 500; letter-spacing: 0.02em; }
-  
-  input, select, textarea { 
-    width: 100%; 
-    padding: 10px 14px; 
-    border: 1px solid var(--brand-border); 
-    border-radius: 8px; 
-    background: var(--brand-bg); 
-    color: var(--brand-text); 
-    font-size: 0.9rem; 
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    font-family: inherit;
-  }
-  
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--brand-primary);
-    box-shadow: 0 0 0 2px rgba(30, 154, 155, 0.2);
-  }
-  
-  textarea { resize: vertical; min-height: 42px; }
-  
-  /* Custom Date Input Styling */
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.7);
-    cursor: pointer;
-  }
-  
-  button { 
-    background: var(--brand-primary); 
-    color: #fff; 
-    border: none; 
-    border-radius: 8px; 
-    padding: 10px 20px; 
-    font-size: 0.9rem; 
-    cursor: pointer; 
-    font-weight: 600; 
-    transition: background 0.2s ease, transform 0.1s ease;
-    font-family: inherit;
-  }
-  
-  button:hover { background: var(--brand-primary-hover); }
-  button:active { transform: translateY(1px); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  
-  button.ghost { 
-    background: transparent; 
-    color: var(--brand-muted); 
-    border: 1px solid var(--brand-border); 
-    font-weight: 500; 
-    padding: 6px 12px; 
-    font-size: 0.75rem; 
-    border-radius: 6px;
-  }
-  button.ghost:hover { 
-    color: var(--brand-text); 
-    border-color: var(--brand-border-light);
-    background: var(--brand-surface-hover);
-  }
-  
-  .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; }
-  .tab { 
-    padding: 8px 16px; 
-    border-radius: 20px; 
-    border: 1px solid var(--brand-border); 
-    font-size: 0.8rem; 
-    color: var(--brand-muted); 
-    cursor: pointer; 
-    white-space: nowrap; 
-    transition: all 0.2s ease;
-    font-weight: 500;
-  }
-  .tab:hover { border-color: var(--brand-border-light); color: var(--brand-text); }
-  .tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
-  
-  .table-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; min-width: 700px; }
-  
-  th { 
-    text-align: left; 
-    font-size: 0.7rem; 
-    color: var(--brand-muted); 
-    text-transform: uppercase; 
-    letter-spacing: 0.05em; 
-    padding: 12px 8px; 
-    border-bottom: 1px solid var(--brand-border); 
-    font-weight: 600;
-  }
-  
-  td { 
-    padding: 16px 8px; 
-    border-bottom: 1px solid var(--brand-border); 
-    font-size: 0.85rem; 
-    vertical-align: middle; 
-  }
-  
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255, 255, 255, 0.02); }
-  
-  .badge { 
-    padding: 4px 10px; 
-    border-radius: 12px; 
-    font-size: 0.7rem; 
-    font-weight: 600; 
-    display: inline-block; 
-    letter-spacing: 0.02em;
-  }
-  
-  .badge.overdue { background: var(--danger-bg); color: var(--danger); }
-  .badge.due { background: var(--warn-bg); color: var(--warn); }
-  .badge.upcoming { background: var(--neutral-bg); color: var(--neutral); }
-  .badge.replied { background: var(--ok-bg); color: var(--ok); }
-  .badge.closed { background: var(--neutral-bg); color: var(--neutral); }
-  
-  .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-  
-  .empty { text-align: center; color: var(--brand-muted); padding: 60px 0; font-size: 0.9rem; }
-  .company { color: var(--brand-muted); font-size: 0.75rem; margin-top: 4px; }
-  
-  /* Scrollbar styling */
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: var(--brand-bg); }
-  ::-webkit-scrollbar-thumb { background: var(--brand-border); border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--brand-border-light); }
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);}
+  button{background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:10px 18px;font-size:.85rem;cursor:pointer;font-weight:700;}
+  button:hover{filter:brightness(1.1);}
+  button:disabled{opacity:.4;cursor:not-allowed;}
+  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--border);font-weight:500;padding:5px 10px;font-size:.72rem;}
+  button.ghost:hover{color:var(--text);border-color:var(--teal-dim);}
+
+  .tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;}
+  .tab{padding:6px 13px;border-radius:20px;border:1px solid var(--border);font-size:.76rem;color:var(--muted);cursor:pointer;white-space:nowrap;}
+  .tab.active{background:var(--teal);color:#04201d;border-color:var(--teal);font-weight:700;}
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;min-width:680px;}
+  th{text-align:left;font-size:.66rem;color:var(--muted-dim);text-transform:uppercase;letter-spacing:.04em;padding:9px 10px;border-bottom:1px solid var(--border);}
+  td{padding:11px 10px;border-bottom:1px solid var(--border-soft);font-size:.85rem;vertical-align:top;}
+  .company{color:var(--muted);font-size:.74rem;}
+  .badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;display:inline-block;}
+  .badge.overdue{background:#e5654f22;color:var(--danger);}
+  .badge.due{background:#e0a63d22;color:var(--warn);}
+  .badge.upcoming{background:#7fa19c22;color:var(--muted);}
+  .badge.replied{background:#3ecf8e22;color:var(--ok);}
+  .badge.closed{background:#7fa19c22;color:var(--muted-dim);}
+  .actions{display:flex;gap:6px;flex-wrap:wrap;}
+  .empty{text-align:center;color:var(--muted-dim);padding:30px 0;font-size:.85rem;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:#04100fcc;backdrop-filter:blur(3px);z-index:50;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .modal-head h2{font-size:1.05rem;margin:0;}
+  .modal-close{background:transparent;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;padding:2px 6px;line-height:1;}
+  .btn-new{display:flex;align-items:center;gap:6px;background:var(--teal);color:#04201d;border:none;border-radius:8px;padding:10px 16px;font-size:.85rem;font-weight:700;cursor:pointer;flex-shrink:0;}
+  .btn-new:hover{filter:brightness(1.1);}
+  .stage-select{padding:5px 8px;border-radius:20px;font-size:.72rem;font-weight:700;border:1px solid var(--border);background:var(--card2);cursor:pointer;}
+  .stage-select.overdue{color:var(--danger);border-color:var(--danger);}
+  .stage-select.due{color:var(--warn);border-color:var(--warn);}
+  .stage-select.upcoming{color:var(--muted);}
+  .stage-select.replied{color:var(--ok);border-color:var(--ok);}
+  .stage-select.closed{color:var(--muted-dim);}
+.view{display:none;}
+.view.active{display:block;}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>Outreach Tracker</h1>
-      <div class="sub">GrowUp — cold &amp; warm outreach accountability</div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">G</div>
+      <div><div class="name">GrowUp</div><div class="tag">Outreach</div></div>
     </div>
-  </header>
+    <nav>
+      <a href="#" class="active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        Dashboard</a>
+      <a href="#" data-view="outreach">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Outreach</a>
+      <a href="#" data-view="outreach" data-anchor="week">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>
+        Follow-ups</a>
+      <a href="#" data-view="outreach" data-anchor="funnel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></svg>
+        Pipeline</a>
+      <a href="#" data-view="outreach" data-anchor="activity">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20V10M10 20V4M17 20v-7"/></svg>
+        Analytics</a>
+    </nav>
+    <div class="side-foot">Turn conversations<br>into pipeline.</div>
+  </aside>
 
-  <div class="setup" id="setupMsg">
-    <strong>Setup Required:</strong> Add your Supabase URL and anon key at the top of the &lt;script&gt; block in index.html, then run schema.sql in your Supabase project's SQL editor. See README.md for the full steps.
-  </div>
+  <main class="main" id="top">
+    <div class="topbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchBox" placeholder="Search prospects, companies…">
+      </div>
+      <div class="avatar">MJ</div>
+    </div>
 
-  <div class="stats" id="stats"></div>
+    <div class="hero" style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Turn Conversations Into Pipeline.</h1>
+        <p>Track. Follow up. Win. A disciplined approach to outreach.</p>
+      </div>
+      <button type="button" class="btn-new" id="openAddModal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 5v14M5 12h14"/></svg>
+        New outreach
+      </button>
+    </div>
 
-  <form class="card" id="addForm">
-    <div class="row">
-      <div><label>Name</label><input id="f_name" required placeholder="Jane Doe"></div>
-      <div><label>Company</label><input id="f_company" placeholder="Acme Ltd"></div>
-      <div><label>Channel</label>
-        <select id="f_channel">
-          <option>LinkedIn</option><option>Email</option><option>Cold Call</option><option>Other</option>
-        </select>
+    <div class="setup" id="setupMsg">
+      Add your Supabase URL and anon key at the top of the &lt;script&gt; block, then run schema.sql in your
+      Supabase SQL editor.
+    </div>
+
+    <div class="view active" id="view-dashboard">
+      <div class="stats" id="stats"></div>
+
+      <div class="tabs" id="tabs"></div>
+      <div class="panel table-scroll" style="padding:6px 8px;">
+        <table>
+          <thead><tr><th>Company / Contact</th><th>Channel</th><th>Stage</th><th>Last activity</th><th>Next step</th><th>Notes</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
       </div>
     </div>
-    <div class="row">
-      <div><label>Date sent</label><input type="date" id="f_dateSent" required></div>
-      <div><label>Follow up in (days)</label><input type="number" id="f_days" value="3" min="1"></div>
-      <div><label>Notes</label><input id="f_notes" placeholder="e.g. found via LinkedIn search"></div>
-    </div>
-    <button type="submit" id="addBtn" style="margin-top: 8px;">Add contact</button>
-  </form>
 
-  <div class="tabs" id="tabs"></div>
-  <div class="card table-scroll" style="padding: 0;">
-    <table>
-      <thead><tr><th>Contact</th><th>Channel</th><th>Sent</th><th>Follow-up</th><th>Status</th><th>Notes</th><th></th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table>
-    <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
-  </div>
+    <div class="view" id="view-outreach">
+      <div class="grid2">
+        <div class="panel" id="activity">
+          <h2>Outreach Activity</h2>
+          <div class="sub">Contacts sent, last 14 days</div>
+          <div class="bars" id="bars"></div>
+          <div class="bars-x" id="barsX"></div>
+        </div>
+        <div class="panel" id="funnel">
+          <h2>Outreach Funnel</h2>
+          <div class="sub">Where prospects stand right now</div>
+          <div id="funnelBody"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="week" style="margin-bottom:14px;">
+        <h2>This Week</h2>
+        <div class="sub">Follow-ups due in the next 7 days</div>
+        <div id="weekBody"></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="addModalOverlay">
+      <div class="modal" id="add">
+        <div class="modal-head">
+          <h2>New outreach</h2>
+          <button type="button" class="modal-close" id="closeAddModal">&times;</button>
+        </div>
+        <form id="addForm">
+          <div class="row">
+            <div><label>Name</label><input id="f_name" required placeholder="Jane Doe"></div>
+            <div><label>Company</label><input id="f_company" placeholder="Acme Ltd"></div>
+          </div>
+          <div class="row">
+            <div><label>Channel</label>
+              <select id="f_channel"><option>LinkedIn</option><option>Email</option><option>Cold Call</option><option>Other</option></select>
+            </div>
+            <div><label>Date sent</label><input type="date" id="f_dateSent" required></div>
+          </div>
+          <div class="row">
+            <div><label>Follow up in (days)</label><input type="number" id="f_days" value="3" min="1"></div>
+            <div><label>Notes</label><input id="f_notes" placeholder="e.g. found via LinkedIn search"></div>
+          </div>
+          <button type="submit" id="addBtn">Add contact</button>
+        </form>
+      </div>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -280,6 +270,7 @@ const configured = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY
 const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 let filter = 'active';
+let query = '';
 let contacts = [];
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
@@ -301,17 +292,62 @@ async function loadContacts(){
   contacts = data || [];
 }
 
+function filtered(){
+  return contacts.filter(c=>{
+    if(!query) return true;
+    const q = query.toLowerCase();
+    return (c.name||'').toLowerCase().includes(q) || (c.company||'').toLowerCase().includes(q);
+  });
+}
+
 function renderStats(){
-  const active = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed');
-  const overdue = active.filter(c=>statusOf(c)==='Overdue').length;
-  const due = active.filter(c=>statusOf(c)==='Due').length;
-  const replied = contacts.filter(c=>c.status==='Replied').length;
-  const rate = contacts.length ? Math.round(replied/contacts.length*100) : 0;
-  document.getElementById('stats').innerHTML = `
-    <div class="stat"><div class="n">${contacts.length}</div><div class="l">Total</div></div>
-    <div class="stat overdue"><div class="n">${overdue}</div><div class="l">Overdue</div></div>
-    <div class="stat due"><div class="n">${due}</div><div class="l">Due today</div></div>
-    <div class="stat replied"><div class="n">${rate}%</div><div class="l">Reply rate</div></div>`;
+  const list = filtered();
+  const active = list.filter(c=>c.status!=='Replied' && c.status!=='Closed');
+  const replied = list.filter(c=>c.status==='Replied').length;
+  const rate = list.length ? Math.round(replied/list.length*100) : 0;
+  const cards = [['Total Contacts', list.length],['Active', active.length],['Replies', replied],['Reply Rate', rate+'%']];
+  document.getElementById('stats').innerHTML = cards.map(([l,n])=>`
+    <div class="stat">
+      <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></div></div>
+      <div class="n">${n}</div>
+      <div class="l">${l}</div>
+    </div>`).join('');
+}
+
+function renderBars(){
+  const days = [...Array(14)].map((_,i)=> addDays(todayStr(), i-13));
+  const counts = days.map(d => contacts.filter(c=>c.date_sent===d).length);
+  const max = Math.max(1, ...counts);
+  document.getElementById('bars').innerHTML = counts.map(c=>
+    `<div class="bar" style="height:${Math.max(4,(c/max)*100)}%" title="${c}"></div>`).join('');
+  document.getElementById('barsX').innerHTML = days.map(d=>`<span>${d.slice(5)}</span>`).join('');
+}
+
+function renderFunnel(){
+  const total = contacts.length || 0;
+  const replied = contacts.filter(c=>c.status==='Replied' || c.status==='Closed').length;
+  const closed = contacts.filter(c=>c.status==='Closed').length;
+  const stages = [['Sent', total, total],['Replied', replied, total],['Closed', closed, total]];
+  document.getElementById('funnelBody').innerHTML = stages.map(([l,v,base])=>{
+    const pct = base ? Math.round(v/base*100) : 0;
+    return `<div class="funnel-row"><div class="lbl">${l}</div><div class="track"><div class="fill" style="width:${pct}%"></div></div><div class="val">${v}</div></div>`;
+  }).join('');
+}
+
+function renderWeek(){
+  const today = todayStr();
+  const end = addDays(today, 7);
+  const due = contacts.filter(c=>c.status!=='Replied' && c.status!=='Closed' && c.follow_up_date <= end)
+                       .sort((a,b)=>a.follow_up_date.localeCompare(b.follow_up_date));
+  const body = document.getElementById('weekBody');
+  if(!due.length){ body.innerHTML = '<div class="week-empty">Nothing due this week — you are caught up.</div>'; return; }
+  body.innerHTML = due.map(c=>`
+    <div class="week-item">
+      <input type="checkbox" data-act="followup" data-id="${c.id}">
+      <div class="who"><b>${esc(c.name)}</b> — ${esc(c.company||'')}</div>
+      <div class="date">${c.follow_up_date}</div>
+    </div>`).join('');
+  body.querySelectorAll('input').forEach(cb=>cb.onchange=()=>handleAction('followup', cb.dataset.id));
 }
 
 function renderTabs(){
@@ -322,7 +358,7 @@ function renderTabs(){
 }
 
 function renderRows(){
-  let list = contacts.map(c=>({...c, _status: statusOf(c)}));
+  let list = filtered().map(c=>({...c, _status: statusOf(c)}));
   if(filter==='active') list = list.filter(c=>c._status!=='Replied' && c._status!=='Closed');
   else if(filter!=='all') list = list.filter(c=>c._status===filter);
   list.sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
@@ -331,28 +367,39 @@ function renderRows(){
   document.getElementById('emptyMsg').style.display = list.length ? 'none':'block';
   rows.innerHTML = list.map(c => `
     <tr>
-      <td><strong>${esc(c.name)}</strong><div class="company">${esc(c.company||'')}</div></td>
+      <td><strong>${esc(c.company||c.name)}</strong><div class="company">${esc(c.name)}</div></td>
       <td>${esc(c.channel)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <select class="stage-select ${badgeClass(c._status)}" data-id="${c.id}">
+            <option value="Sent" ${c.status!=='Replied'&&c.status!=='Closed'?'selected':''}>${c._status==='Overdue'||c._status==='Due'?c._status:'Active'}</option>
+            <option value="Replied" ${c.status==='Replied'?'selected':''}>Replied</option>
+            <option value="Closed" ${c.status==='Closed'?'selected':''}>Closed</option>
+          </select>
+          ${c.status!=='Replied' && c.status!=='Closed' ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
+        </div>
+      </td>
       <td>${c.date_sent}</td>
       <td>${c.follow_up_date}</td>
-      <td><span class="badge ${badgeClass(c._status)}">${c._status}</span></td>
-      <td style="color: var(--brand-muted); font-size: 0.8rem;">${esc(c.notes||'')}</td>
+      <td>${esc(c.notes||'')}</td>
       <td><div class="actions">
-        ${c.status!=='Replied' ? `<button class="ghost" data-act="reply" data-id="${c.id}">Replied</button>`:''}
-        ${c.status!=='Closed' && c.status!=='Replied' ? `<button class="ghost" data-act="followup" data-id="${c.id}">Followed up</button>`:''}
-        ${c.status!=='Closed' ? `<button class="ghost" data-act="close" data-id="${c.id}">Close</button>`:''}
         <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
       </div></td>
     </tr>`).join('');
-  rows.querySelectorAll('button').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+  rows.querySelectorAll('.stage-select').forEach(sel=>sel.onchange=()=>{
+    const act = sel.value==='Replied' ? 'reply' : sel.value==='Closed' ? 'close' : 'reopen';
+    handleAction(act, sel.dataset.id);
+  });
+  rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
 }
 
-function renderAll(){ renderStats(); renderTabs(); renderRows(); }
+function renderAll(){ renderStats(); renderBars(); renderFunnel(); renderWeek(); renderTabs(); renderRows(); }
 
 async function handleAction(act,id){
   if(!supa) return;
   if(act==='reply') await supa.from('contacts').update({status:'Replied'}).eq('id', id);
   if(act==='close') await supa.from('contacts').update({status:'Closed'}).eq('id', id);
+  if(act==='reopen') await supa.from('contacts').update({status:'Sent'}).eq('id', id);
   if(act==='del') await supa.from('contacts').delete().eq('id', id);
   if(act==='followup'){
     const t = todayStr();
@@ -382,6 +429,26 @@ document.getElementById('addForm').addEventListener('submit', async e=>{
   e.target.reset();
   document.getElementById('f_dateSent').value = todayStr();
   document.getElementById('f_days').value = 3;
+  closeAddModal();
+});
+
+document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
+
+document.querySelectorAll('nav a[data-view]').forEach(a=>{
+  a.addEventListener('click', (e)=>{
+    e.preventDefault();
+    document.querySelectorAll('nav a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+a.dataset.view).classList.add('active');
+    const anchor = a.dataset.anchor;
+    if(anchor){
+      requestAnimationFrame(()=>{
+        const el = document.getElementById(anchor);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    }
+  });
 });
 
 (async function init(){
