@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>GrowUp Outreach Tracker — Outreach</title>
-<link rel="icon" type="image/png" href="growuplogo.png">
+<link rel="icon" type="image/png" id="favicon" href="growuplogo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -171,13 +171,27 @@
 .funnel-row .val{width:28px;}
 .funnel-row .pct{width:38px;text-align:right;font-size:.7rem;color:var(--muted-dim);font-weight:600;flex-shrink:0;}
 
+/* workspace switcher */
+.ws{position:relative;margin-top:auto;padding-top:14px;border-top:1px solid var(--sidebar-border);}
+.ws-btn{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;border:1px solid var(--sidebar-border);background:transparent;color:var(--sidebar-text-active);cursor:pointer;text-align:left;font-size:.82rem;font-weight:600;transition:.15s;}
+.ws-btn:hover{background:var(--sidebar-border);}
+.ws-btn > svg{width:14px;height:14px;color:var(--sidebar-text);flex-shrink:0;}
+.ws-dot{width:26px;height:26px;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.ws-dot img{width:18px;height:18px;object-fit:contain;}
+.ws-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ws-menu{display:none;position:absolute;left:0;right:0;bottom:calc(100% - 4px);background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 28px rgba(0,0,0,.4);z-index:20;}
+.ws-menu.open{display:block;}
+.ws-menu button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;color:var(--text);padding:8px 10px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;text-align:left;}
+.ws-menu button:hover{background:var(--teal-glow);}
+.ws-menu button.on{font-weight:700;color:var(--teal-accent);}
+
 </style>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
     <div class="brand">
-      <img src="growupblacklogotransparent.png" alt="GrowUp Logo">
+      <img id="brandLogo" src="growupblacklogotransparent.png" alt="GrowUp Logo">
     </div>
     <nav>
       <a href="index.html">
@@ -190,10 +204,15 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/><path d="m8.5 15 2.2 2.2L15.5 13"/></svg>
         Follow-ups<span class="nav-badge" id="fuBadge" style="display:none;"></span></a>
     </nav>
-    <div class="side-foot">
-      <strong>More pipeline</strong>
-      Turn conversations into pipeline.
-    </div>
+
+<div class="ws">
+  <div class="ws-menu" id="wsMenu"></div>
+  <button type="button" class="ws-btn" id="wsBtn">
+    <span class="ws-dot"><img id="wsDot" src="growuplogo.png" alt=""></span>
+    <span class="ws-name" id="wsName">GrowUp</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+  </button>
+</div>
   </aside>
 
   <main class="main" id="top">
@@ -258,12 +277,19 @@ const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_AN
 let query = '';
 let contacts = [];
 
+const WORKSPACES = {
+  growup:      { name: 'GrowUp',      logo: 'growupblacklogotransparent.png',       icon: 'growuplogo.png' },
+  attributeiq: { name: 'AttributeIQ', logo: 'aiqblacklogowithtext-transparent.png', icon: 'aiqblacklogo.png' }
+};
+let workspace = localStorage.getItem('gu_workspace');
+if(!WORKSPACES[workspace]) workspace = 'growup';
+
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function addDays(dateStr, n){ const d = new Date(dateStr); d.setDate(d.getDate()+Number(n)); return d.toISOString().slice(0,10); }
 
 async function loadContacts(){
   if(!supa) return;
-  const { data, error } = await supa.from('contacts').select('*').order('follow_up_date');
+  const { data, error } = await supa.from('contacts').select('*').eq('workspace', workspace).order('follow_up_date');
   if(error){ console.error(error); return; }
   contacts = data || [];
 }
@@ -329,7 +355,40 @@ function renderAll(){ renderBadge(); renderBars(); renderFunnel(); }
 
 document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
 
+// --- Workspace switcher ---
+function applyWorkspace(){
+  const w = WORKSPACES[workspace];
+  const logo = document.getElementById('brandLogo');
+  logo.src = w.logo;
+  logo.alt = w.name + ' Logo';
+  document.getElementById('wsName').textContent = w.name;
+  document.getElementById('wsDot').src = w.icon;
+  document.getElementById('favicon').href = w.icon;
+  document.title = w.name + ' Outreach Tracker — Outreach';
+  document.getElementById('wsMenu').innerHTML = Object.entries(WORKSPACES).map(([k,v]) =>
+    `<button type="button" data-ws="${k}" class="${k===workspace?'on':''}"><span class="ws-dot"><img src="${v.icon}" alt=""></span>${v.name}</button>`
+  ).join('');
+  document.querySelectorAll('#wsMenu button').forEach(b => b.onclick = () => switchWorkspace(b.dataset.ws));
+}
+async function switchWorkspace(key){
+  document.getElementById('wsMenu').classList.remove('open');
+  if(key === workspace) return;
+  workspace = key;
+  localStorage.setItem('gu_workspace', key);
+  query = '';
+  document.getElementById('searchBox').value = '';
+  applyWorkspace();
+  await loadContacts();
+  renderAll();
+}
+document.getElementById('wsBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('wsMenu').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('wsMenu').classList.remove('open'));
+
 (async function init(){
+  applyWorkspace();
   if(!configured){
     document.getElementById('setupMsg').style.display = 'block';
     return;
