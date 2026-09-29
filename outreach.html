@@ -66,7 +66,7 @@
 
   /* --- Sidebar --- */
   .sidebar{
-    width:184px; flex-shrink:0; padding:24px 14px;
+    width:224px; flex-shrink:0; padding:24px 14px;
     background: var(--sidebar-bg);
     border-right:1px solid var(--divider);
     position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:30px;
@@ -142,6 +142,35 @@
     box-shadow: var(--shadow-btn);
   }
   .btn-new:hover{background:var(--teal-hover); box-shadow: 0 2px 8px var(--teal-glow);}
+
+/* nav badge */
+.nav-badge{margin-left:auto;min-width:20px;text-align:center;padding:2px 7px;border-radius:20px;background:rgba(226,112,95,.18);color:var(--danger);font-size:.72rem;font-weight:700;line-height:1.3;}
+
+/* premium charts */
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:26px;}
+.panel-head h2{margin:0 0 4px;}
+.panel-head .sub{margin-bottom:0;}
+.big{font-size:1.65rem;font-weight:700;line-height:1;text-align:right;letter-spacing:-.02em;}
+.big small{display:block;font-size:.68rem;font-weight:500;color:var(--muted-dim);margin-top:6px;letter-spacing:0;}
+
+.bars{gap:0;height:140px;border-bottom:1px solid var(--border);background-image:repeating-linear-gradient(to top,var(--border-soft) 0,var(--border-soft) 1px,transparent 1px,transparent 35px);}
+.bars .slot{flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;position:relative;cursor:default;}
+.bars .bar{flex:none;width:6px;min-height:0;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--teal-accent),rgba(28,131,132,.2));box-shadow:none;transition:width .15s,filter .15s;}
+.bars .bar.zero{height:2px!important;background:var(--border);}
+.bars .bar.today{background:linear-gradient(180deg,#8ff0ea,var(--teal));box-shadow:0 0 14px rgba(63,194,188,.5);}
+.bars .slot:hover .bar{width:9px;filter:brightness(1.25);}
+.bars .slot::after{content:attr(data-tip);position:absolute;top:-8px;left:50%;transform:translate(-50%,-100%);background:var(--card2,#123634);border:1px solid var(--border);color:var(--text);font-size:.68rem;font-weight:600;padding:4px 9px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:5;box-shadow:0 8px 20px rgba(0,0,0,.35);}
+.bars .slot:hover::after{opacity:1;}
+.bars-x{gap:0;margin-top:10px;}
+.bars-x span{font-size:.62rem;}
+
+.funnel-row{gap:14px;margin-bottom:24px;}
+.funnel-row .lbl{width:58px;font-weight:500;}
+.funnel-row .track{height:8px;border-radius:99px;background:rgba(255,255,255,.05);border:none;overflow:visible;}
+.funnel-row .fill{border-radius:99px;box-shadow:0 0 12px rgba(63,194,188,.4);}
+.funnel-row .val{width:28px;}
+.funnel-row .pct{width:38px;text-align:right;font-size:.7rem;color:var(--muted-dim);font-weight:600;flex-shrink:0;}
+
 </style>
 </head>
 <body>
@@ -159,7 +188,7 @@
         Outreach</a>
       <a href="followups.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/><path d="m8.5 15 2.2 2.2L15.5 13"/></svg>
-        Follow-ups</a>
+        Follow-ups<span class="nav-badge" id="fuBadge" style="display:none;"></span></a>
     </nav>
     <div class="side-foot">
       <strong>More pipeline</strong>
@@ -193,14 +222,24 @@
 
     <div class="grid2">
       <div class="panel" id="activity">
-        <h2>Outreach Activity</h2>
-        <div class="sub">Contacts sent, last 14 days</div>
+        <div class="panel-head">
+          <div>
+            <h2>Outreach Activity</h2>
+            <div class="sub">Contacts sent, last 14 days</div>
+          </div>
+          <div class="big" id="actTotal">0</div>
+        </div>
         <div class="bars" id="bars"></div>
         <div class="bars-x" id="barsX"></div>
       </div>
       <div class="panel" id="funnel">
-        <h2>Outreach Funnel</h2>
-        <div class="sub">Where prospects stand right now</div>
+        <div class="panel-head">
+          <div>
+            <h2>Outreach Funnel</h2>
+            <div class="sub">Where prospects stand right now</div>
+          </div>
+          <div class="big" id="funnelRate">0%</div>
+        </div>
         <div id="funnelBody"></div>
       </div>
     </div>
@@ -237,14 +276,22 @@ function filtered(){
   });
 }
 
+function fmtDay(d){ return new Date(d+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
+
 function renderBars(){
   const list = filtered();
-  const days = [...Array(14)].map((_,i)=> addDays(todayStr(), i-13));
+  const today = todayStr();
+  const days = [...Array(14)].map((_,i)=> addDays(today, i-13));
   const counts = days.map(d => list.filter(c=>c.date_sent===d).length);
   const max = Math.max(1, ...counts);
-  document.getElementById('bars').innerHTML = counts.map(c=>
-    `<div class="bar" style="height:${Math.max(4,(c/max)*100)}%" title="${c}"></div>`).join('');
-  document.getElementById('barsX').innerHTML = days.map(d=>`<span>${d.slice(5)}</span>`).join('');
+  const total = counts.reduce((a,b)=>a+b,0);
+  document.getElementById('actTotal').innerHTML = `${total}<small>sent in 14 days</small>`;
+  document.getElementById('bars').innerHTML = counts.map((n,i)=>{
+    const cls = n===0 ? 'zero' : (days[i]===today ? 'today' : '');
+    return `<div class="slot" data-tip="${fmtDay(days[i])} · ${n} sent"><div class="bar ${cls}" style="height:${(n/max)*92}%"></div></div>`;
+  }).join('');
+  document.getElementById('barsX').innerHTML = days.map((d,i)=>
+    `<span>${i%2===1 ? fmtDay(d) : ''}</span>`).join('');
 }
 
 function renderFunnel(){
@@ -256,17 +303,29 @@ function renderFunnel(){
     ['Replied', replied, total],
     ['Won', closed, total]
   ];
+  const rate = total ? Math.round(replied/total*100) : 0;
+  document.getElementById('funnelRate').innerHTML = `${rate}%<small>reply rate</small>`;
   document.getElementById('funnelBody').innerHTML = stages.map(([l,v,base])=>{
     const pct = base ? Math.round(v/base*100) : 0;
     return `<div class="funnel-row">
       <div class="lbl">${l}</div>
       <div class="track"><div class="fill" style="width:${pct}%"></div></div>
       <div class="val">${v}</div>
+      <div class="pct">${pct}%</div>
     </div>`;
   }).join('');
 }
 
-function renderAll(){ renderBars(); renderFunnel(); }
+function renderBadge(){
+  const today = todayStr();
+  const n = contacts.filter(c=>!['Replied','Won','Lost'].includes(c.status) && c.follow_up_date <= today).length;
+  const b = document.getElementById('fuBadge');
+  if(!b) return;
+  b.textContent = n;
+  b.style.display = n ? 'inline-block' : 'none';
+}
+
+function renderAll(){ renderBadge(); renderBars(); renderFunnel(); }
 
 document.getElementById('searchBox').addEventListener('input', e=>{ query = e.target.value; renderAll(); });
 

@@ -63,7 +63,7 @@
 
   /* --- Sidebar --- */
   .sidebar{
-    width:184px; flex-shrink:0; padding:24px 14px;
+    width:224px; flex-shrink:0; padding:24px 14px;
     background: var(--sidebar-bg);
     border-right:1px solid var(--divider);
     position:sticky; top:0; height:100vh; display:flex; flex-direction:column; gap:30px;
@@ -79,6 +79,7 @@
   nav a:hover{background:var(--sidebar-border);color:var(--sidebar-text-active);}
   nav a.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);font-weight:600;}
   nav svg{width:17px;height:17px;flex-shrink:0;}
+  .nav-badge{margin-left:auto;min-width:20px;text-align:center;padding:2px 7px;border-radius:20px;background:rgba(226,112,95,.18);color:var(--danger);font-size:.72rem;font-weight:700;line-height:1.3;}
 
   .side-foot{margin-top:auto;font-size:.72rem;color:var(--sidebar-text);padding:14px 12px 0;line-height:1.6;border-top:1px solid var(--sidebar-border);}
   .side-foot strong { color: var(--sidebar-text-active); display: block; margin-bottom: 4px; font-size: 0.76rem; font-weight:600; }
@@ -136,9 +137,73 @@
   .company{color:var(--muted);font-size:.78rem;margin-top: 3px;}
   .actions{display:flex;gap:8px;flex-wrap:wrap;}
   .empty{text-align:center;color:var(--muted-dim);padding:44px 0;font-size:.88rem;}
+  .tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ok);color:#06231f;font-size:.78rem;font-weight:800;}
+  .tick-empty{display:inline-block;width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--muted-dim);}
+  .tick-btn{background:none;border:0;padding:0;cursor:pointer;line-height:0;}
+  .tick-btn:hover .tick-empty{border-color:var(--ok);}
+  .msg-cell{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.82rem;}
 
   /* Clickable contact link */
   .contact-link { cursor: pointer; transition: color .15s; }
+  .logo{width:36px;height:36px;border-radius:9px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+  .logo img{width:24px;height:24px;object-fit:contain;}
+  .logo-fallback{background:var(--teal-glow);color:var(--teal-accent);font-weight:700;font-size:.9rem;}
+  .chan{display:inline-flex;align-items:center;gap:8px;}
+  .icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;padding:0;}
+  .icon-btn:hover{color:var(--text);border-color:var(--teal);background:var(--teal-glow);}
+  .icon-btn svg{width:16px;height:16px;}
+  .row-menu{position:fixed;z-index:80;min-width:190px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px;box-shadow:0 12px 28px rgba(0,0,0,.4);}
+  .row-menu button{display:block;width:100%;text-align:left;background:none;border:0;color:var(--text);padding:9px 12px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;}
+  .row-menu button:hover{background:var(--teal-glow);}
+  .row-menu button.danger{color:var(--danger);}
+
+  /* status pills */
+  .stage-select{appearance:none;-webkit-appearance:none;width:auto;min-width:112px;padding:6px 28px 6px 12px;border-radius:999px;border:1px solid transparent;font-size:.76rem;font-weight:600;background-color:rgba(255,255,255,.06);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239db4af' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+  .stage-select option{background:#0f2f2c;color:#eef6f4;}
+  .stage-select.upcoming{background-color:rgba(74,144,226,.16);color:#6db3f2;border-color:rgba(74,144,226,.3);}
+  .stage-select.due{background-color:rgba(217,162,79,.16);color:var(--warn);border-color:rgba(217,162,79,.3);}
+  .stage-select.overdue{background-color:rgba(226,112,95,.16);color:var(--danger);border-color:rgba(226,112,95,.3);}
+  .stage-select.replied,.stage-select.won{background-color:rgba(63,189,133,.16);color:var(--ok);border-color:rgba(63,189,133,.3);}
+  .stage-select.meeting{background-color:rgba(200,162,106,.16);color:var(--gold);border-color:rgba(200,162,106,.3);}
+  .stage-select.lost{background-color:rgba(226,112,95,.1);color:var(--danger);border-color:rgba(226,112,95,.25);}
+
+  /* tabs with counts + sort bar */
+  .tabbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+  .tabbar .tabs{margin-bottom:0;flex:1;min-width:0;}
+  .tab{display:inline-flex;align-items:center;gap:8px;border-radius:999px;border:1px solid var(--border);padding:7px 14px;}
+  .tab.active{border-color:var(--teal);}
+  .tab .count{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--muted);}
+  .tab.active .count{background:var(--teal-glow);color:var(--teal-accent);}
+  .sort-select{width:auto;min-width:200px;padding:8px 12px;font-size:.8rem;cursor:pointer;}
+  th.sortable{cursor:pointer;user-select:none;white-space:nowrap;}
+  .list-search{display:flex;align-items:center;gap:8px;min-width:230px;padding:0 12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--muted-dim);transition:.15s;}
+  .list-search:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-glow);}
+  .list-search svg{width:15px;height:15px;flex-shrink:0;}
+  .list-search input{border:none;background:transparent;padding:9px 0;font-size:.8rem;box-shadow:none;}
+  .list-search input:focus{border:none;box-shadow:none;}
+
+  /* clean status: no background, coloured text */
+  select.stage-select{width:auto;min-width:0;padding:6px 22px 6px 6px;border:none;border-radius:8px;font-size:.8rem;font-weight:600;background-color:transparent;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236d8681' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 6px center;}
+  select.stage-select:hover{background-color:rgba(255,255,255,.05);}
+  select.stage-select.upcoming{background-color:transparent;border-color:transparent;color:#6db3f2;}
+  select.stage-select.due{background-color:transparent;border-color:transparent;color:var(--warn);}
+  select.stage-select.overdue{background-color:transparent;border-color:transparent;color:var(--danger);}
+  select.stage-select.replied,select.stage-select.won{background-color:transparent;border-color:transparent;color:var(--ok);}
+  select.stage-select.meeting{background-color:transparent;border-color:transparent;color:var(--gold);}
+  select.stage-select.lost{background-color:transparent;border-color:transparent;color:var(--danger);}
+  select.stage-select:hover{background-color:rgba(255,255,255,.05);}
+  th.sortable:hover{color:var(--text);}
+  th.sorted{color:var(--teal-accent);}
+  th .arr{font-size:.6rem;opacity:.75;}
+
+  /* pagination */
+  .pager{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:18px;font-size:.8rem;color:var(--muted);}
+  .pager select{width:auto;padding:6px 10px;font-size:.8rem;margin:0 6px;cursor:pointer;}
+  .pager-nav{display:flex;align-items:center;gap:4px;}
+  .pg{min-width:32px;height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-weight:600;cursor:pointer;transition:.15s;}
+  .pg:hover:not(:disabled){color:var(--text);border-color:var(--teal);}
+  .pg.on{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .pg-dots{padding:0 4px;}
   .contact-link:hover strong { color: var(--teal-accent); }
 
   /* --- Forms & buttons --- */
@@ -196,7 +261,7 @@
     background: var(--card);
     border-left: 1px solid var(--border);
     width: 100%;
-    max-width: 440px;
+    max-width: 640px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -256,6 +321,11 @@
     .main{ padding: 20px 16px 40px; }
     .drawer{ max-width: 100%; }
   }
+  /* stat card sparklines */
+.stat{position:relative;overflow:hidden;min-height:128px;}
+.stat .n,.stat .l{position:relative;z-index:1;}
+.stat-spark{position:absolute;right:16px;bottom:16px;width:46%;height:52px;color:var(--teal-accent);pointer-events:none;}
+.stat-spark path{vector-effect:non-scaling-stroke;}
 </style>
 </head>
 <body>
@@ -273,7 +343,7 @@
         Outreach</a>
       <a href="followups.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/><path d="m8.5 15 2.2 2.2L15.5 13"/></svg>
-        Follow-ups</a>
+        Follow-ups<span class="nav-badge" id="fuBadge" style="display:none;"></span></a>
     </nav>
     <div class="side-foot">
       <strong>More pipeline</strong>
@@ -309,13 +379,31 @@
     <div class="stats" id="stats"></div>
 
     <div class="panel">
-      <div class="tabs" id="tabs"></div>
+      <div class="tabbar">
+        <div class="tabs" id="tabs"></div>
+        <div class="list-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="listSearch" placeholder="Search this list...">
+        </div>
+        <select id="sortSelect" class="sort-select">
+          <option value="" hidden>Sort by</option>
+          <option value="follow_up_date:asc">Next follow-up: soonest</option>
+          <option value="follow_up_date:desc">Next follow-up: latest</option>
+          <option value="date_sent:desc">Last message: newest</option>
+          <option value="date_sent:asc">Last message: oldest</option>
+          <option value="company:asc">Company: A to Z</option>
+          <option value="company:desc">Company: Z to A</option>
+          <option value="status:asc">Status</option>
+          <option value="replied:desc">Replied first</option>
+        </select>
+      </div>
       <div class="table-scroll">
         <table>
-          <thead><tr><th>Company / Contact</th><th>Channel</th><th>Stage</th><th></th></tr></thead>
+          <thead><tr><th class="sortable" data-sort="company">Company / Contact<span class="arr"></span></th><th class="sortable" data-sort="channel">Channel<span class="arr"></span></th><th class="sortable" data-sort="date_sent">Last Message<span class="arr"></span></th><th class="sortable" data-sort="follow_up_date">Next Follow-up<span class="arr"></span></th><th class="sortable" data-sort="status">Status<span class="arr"></span></th><th class="sortable" data-sort="replied">Replied?<span class="arr"></span></th><th>Actions</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
-        <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet — add one above.</div>
+        <div class="empty" id="emptyMsg" style="display:none;">No contacts here yet, add one above.</div>
+        <div class="pager" id="pager"></div>
       </div>
     </div>
 
@@ -329,6 +417,9 @@
           <div class="row">
             <div><label>Name</label><input id="f_name" required placeholder="Jane Doe"></div>
             <div><label>Company</label><input id="f_company" placeholder="Acme Ltd"></div>
+          </div>
+          <div class="row">
+            <div><label>Website</label><input id="f_website" placeholder="acme.com"></div>
           </div>
           <div class="row">
             <div><label>Channel</label>
@@ -354,7 +445,7 @@
 
 
 <div class="modal-overlay" id="editModalOverlay">
-  <div class="modal">
+  <div class="modal" style="max-width:720px;">
     <div class="modal-head">
       <h2>Edit Contact</h2>
       <button type="button" class="modal-close" id="closeEditModal">&times;</button>
@@ -364,6 +455,9 @@
       <div class="row">
         <div><label>Name</label><input id="e_name" required></div>
         <div><label>Company</label><input id="e_company"></div>
+      </div>
+      <div class="row">
+        <div><label>Website</label><input id="e_website" placeholder="acme.com"></div>
       </div>
       <div class="row">
         <div><label>Channel</label>
@@ -399,6 +493,20 @@
   </main>
 </div>
 
+<div class="modal-overlay" id="followModalOverlay">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-head">
+      <h2>Set follow-up date</h2>
+      <button type="button" class="modal-close" id="closeFollowModal">&times;</button>
+    </div>
+    <form id="followForm">
+      <input type="hidden" id="fu_id">
+      <div class="row"><div><label>Next follow-up</label><input type="date" id="fu_date" required></div></div>
+      <button type="submit" class="primary" style="width:100%;margin-top:8px;padding:12px;">Save date</button>
+    </form>
+  </div>
+</div>
+
 <!-- Slide-out Drawer for Contact Details -->
 <div class="drawer-overlay" id="drawerOverlay">
   <div class="drawer" id="detailDrawer">
@@ -421,21 +529,43 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const configured = !SUPABASE_URL.includes('YOUR_SUPABASE') && !SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
 const supa = configured ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-let filter = 'active';
+let filter = 'all';
 let query = '';
+let listQuery = '';
 let contacts = [];
+let sortKey = 'follow_up_date', sortDir = 'asc';
+let page = 1;
+let pageSize = Number(localStorage.getItem('gu_pageSize')) || 10;
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function addDays(dateStr, n){ const d = new Date(dateStr); d.setDate(d.getDate()+Number(n)); return d.toISOString().slice(0,10); }
 function statusOf(c){
-  if(['Replied','Won','Lost'].includes(c.status)) return c.status;
+  if(['Replied','Meeting Booked','Won','Lost'].includes(c.status)) return c.status;
   const today = todayStr();
   if(c.follow_up_date < today) return 'Overdue';
   if(c.follow_up_date === today) return 'Due';
   return 'Upcoming';
 }
-function badgeClass(s){ return {Overdue:'overdue',Due:'due',Upcoming:'upcoming',Replied:'replied',Closed:'closed'}[s]||'upcoming'; }
+function badgeClass(s){ return {Overdue:'overdue',Due:'due',Upcoming:'upcoming',Replied:'replied',Won:'won','Meeting Booked':'meeting',Lost:'lost',Closed:'closed'}[s]||'upcoming'; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function domainOf(w){
+  if(!w) return '';
+  return String(w).trim().replace(/^https?:\/\//i,'').replace(/^www\./i,'').split(/[\/?#]/)[0];
+}
+function logoHtml(c){
+  const d = domainOf(c.website);
+  const letter = esc((c.company||c.name||'?').trim().charAt(0).toUpperCase());
+  if(!d) return `<span class="logo logo-fallback">${letter}</span>`;
+  return `<span class="logo"><img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=128" alt="" data-l="${letter}" onerror="this.parentNode.classList.add('logo-fallback');this.parentNode.textContent=this.dataset.l"></span>`;
+}
+function channelIcon(ch){
+  const s = 'width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  if(ch==='LinkedIn') return '<svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0A66C2"/><path fill="#fff" d="M7.1 9.8H4.5V19h2.6V9.8zM5.8 5.2a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM19.5 13.9c0-2.5-1.3-4.3-3.6-4.3-1.2 0-2 .6-2.4 1.2V9.8h-2.6V19h2.6v-5c0-1.3.6-2.1 1.7-2.1s1.6.8 1.6 2.1v5h2.7v-5.1z"/></svg>';
+  if(ch==='Email') return `<svg ${s}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`;
+  if(ch==='Cold Call') return `<svg ${s}><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>`;
+  return `<svg ${s}><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg>`;
+}
 
 async function loadContacts(){
   if(!supa) return;
@@ -459,6 +589,14 @@ const STAT_ICONS = {
   'Reply Rate': '<path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/>'
 };
 
+
+const STAT_SPARK = {
+  'Total Contacts': 'M0 44C16 40 30 30 48 32S84 14 120 6',
+  'Active': 'M0 40C14 44 28 26 46 30S88 22 120 8',
+  'Replies': 'M0 46C20 45 34 38 54 34S92 22 120 12',
+  'Reply Rate': 'M0 42C18 46 32 30 52 32S90 16 120 10'
+};
+
 function renderStats(){
   const list = filtered();
   const active = list.filter(c=>!['Replied','Won','Lost'].includes(c.status));
@@ -470,21 +608,49 @@ function renderStats(){
       <div class="top"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${STAT_ICONS[l]}</svg></div></div>
       <div class="n">${n}</div>
       <div class="l">${l}</div>
+      <svg class="stat-spark" viewBox="0 0 120 50" preserveAspectRatio="none"><path d="${STAT_SPARK[l]}" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".7"/></svg>
     </div>`).join('');
 }
 
+function filteredList(){
+  const q = listQuery.trim().toLowerCase();
+  return filtered().filter(c => !q ||
+    (c.name||'').toLowerCase().includes(q) ||
+    (c.company||'').toLowerCase().includes(q) ||
+    (c.channel||'').toLowerCase().includes(q) ||
+    (c.notes||'').toLowerCase().includes(q));
+}
+function countFor(key){
+  const sts = filteredList().map(c=>statusOf(c));
+  if(key==='all') return sts.length;
+  if(key==='active') return sts.filter(s=>!['Replied','Won','Lost'].includes(s)).length;
+  return sts.filter(s=>s===key).length;
+}
 function renderTabs(){
-  const tabs = [['active','Active'],['Meeting Booked','Meeting'],['Replied','Replied'],['Won','Won'],['Lost','Lost'],['all','All']];
+  const tabs = [['all','All'],['active','Active'],['Meeting Booked','Meeting'],['Replied','Replied'],['Won','Won'],['Lost','Lost']];
   document.getElementById('tabs').innerHTML = tabs.map(([key,label])=>
-    `<div class="tab ${filter===key?'active':''}" data-f="${key}">${label}</div>`).join('');
-  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f; renderRows();renderTabs();});
+    `<div class="tab ${filter===key?'active':''}" data-f="${key}">${label}<span class="count">${countFor(key)}</span></div>`).join('');
+  document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f; page=1; renderRows();renderTabs();});
 }
 
 function renderRows(){
-  let list = filtered().map(c=>({...c, _status: statusOf(c)}));
+  let list = filteredList().map(c=>({...c, _status: statusOf(c)}));
   if(filter==='active') list = list.filter(c=>!['Replied','Won','Lost'].includes(c._status));
   else if(filter!=='all') list = list.filter(c=>c._status===filter);
-  list.sort((a,b)=> a.follow_up_date.localeCompare(b.follow_up_date));
+  const dir = sortDir==='asc' ? 1 : -1;
+  list.sort((a,b)=>{
+    const x = sortVal(a,sortKey), y = sortVal(b,sortKey);
+    if(x<y) return -dir;
+    if(x>y) return dir;
+    return (a.follow_up_date||'').localeCompare(b.follow_up_date||'');
+  });
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total/pageSize));
+  if(page>pages) page = pages;
+  const start = (page-1)*pageSize;
+  list = list.slice(start, start+pageSize);
+  renderPager(total, pages, start);
+  updateSortUI();
 
   const rows = document.getElementById('rows');
   document.getElementById('emptyMsg').style.display = list.length ? 'none':'block';
@@ -492,12 +658,14 @@ function renderRows(){
   rows.innerHTML = list.map(c => `
     <tr>
       <td>
-        <a href="#" class="contact-link" data-id="${c.id}">
+        <a href="#" class="contact-link" data-id="${c.id}" style="display:flex;align-items:center;gap:12px;">${logoHtml(c)}<div>
           <strong>${esc(c.company||c.name)}</strong>
-          <div class="company">${esc(c.name)}</div>
+          <div class="company">${esc(c.name)}</div></div>
         </a>
       </td>
-      <td>${esc(c.channel)}</td>
+      <td><span class="chan">${channelIcon(c.channel)}${esc(c.channel)}</span></td>
+      <td><div class="msg-cell" title="${esc(c.message || '')}">${c.message && c.message.trim() ? esc(c.date_sent || '____') : '____'}</div></td>
+      <td><div class="msg-cell">${esc(c.follow_up_date || '____')}</div></td>
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           <select class="stage-select ${badgeClass(c._status)}" data-id="${c.id}">
@@ -507,11 +675,14 @@ function renderRows(){
             <option value="Won" ${c.status==='Won'?'selected':''}>Won</option>
             <option value="Lost" ${c.status==='Lost'?'selected':''}>Lost</option>
           </select>
-          ${!['Replied','Won','Lost'].includes(c.status) ? `<button class="ghost" title="Mark followed up today" data-act="followup" data-id="${c.id}" style="padding:5px 7px;">↻</button>` : ''}
+           
         </div>
       </td>
+      <td><button class="tick-btn" data-act="togglereplied" data-id="${c.id}" title="Click to toggle replied">${(c.replied || ['Replied','Meeting Booked','Won'].includes(c.status)) ? '<span class="tick">&#10003;</span>' : '<span class="tick-empty"></span>'}</button></td>
       <td><div class="actions">
-        <button class="ghost" data-act="del" data-id="${c.id}">Delete</button>
+        <button class="icon-btn" data-act="edit" data-id="${c.id}" title="Edit details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+         
+        <button class="icon-btn" data-act="menu" data-id="${c.id}" title="More"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></button>
       </div></td>
     </tr>`).join('');
 
@@ -519,7 +690,12 @@ function renderRows(){
     const act = sel.value==='Replied' ? 'reply' : sel.value==='Won' ? 'won' : sel.value==='Lost' ? 'lost' : sel.value==='Meeting Booked' ? 'meeting' : 'reopen';
     handleAction(act, sel.dataset.id);
   });
-  rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=()=>handleAction(b.dataset.act,b.dataset.id));
+  rows.querySelectorAll('button[data-act]').forEach(b=>b.onclick=(e)=>{
+    const a = b.dataset.act, id = b.dataset.id;
+    if(a==='edit'){ const c = contacts.find(x=>x.id===id); if(c) openEditModal(c); return; }
+    if(a==='menu'){ e.stopPropagation(); openRowMenu(b, id); return; }
+    handleAction(a, id);
+  });
 
   // Attach drawer open listeners
   rows.querySelectorAll('.contact-link').forEach(link=>{
@@ -530,7 +706,15 @@ function renderRows(){
   });
 }
 
-function renderAll(){ renderStats(); renderTabs(); renderRows(); }
+function renderBadge(){
+  const today = todayStr();
+  const n = contacts.filter(c=>!['Replied','Won','Lost'].includes(c.status) && c.follow_up_date <= today).length;
+  const b = document.getElementById('fuBadge');
+  if(!b) return;
+  b.textContent = n;
+  b.style.display = n ? 'inline-block' : 'none';
+}
+function renderAll(){ renderBadge(); renderStats(); renderTabs(); renderRows(); }
 
 function flashRow(id){
   document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
@@ -572,6 +756,17 @@ async function handleAction(act,id){
   if(act==='meeting') result = await supa.from('contacts').update({status:'Meeting Booked'}).eq('id', id);
   if(act==='reopen') result = await supa.from('contacts').update({status:'Sent'}).eq('id', id);
   if(act==='del') result = await supa.from('contacts').delete().eq('id', id);
+  if(act==='togglereplied'){
+    const c = contacts.find(x=>x.id===id);
+    const isTicked = c && (c.replied || ['Replied','Meeting Booked','Won'].includes(c.status));
+    if(isTicked){
+      const upd = {replied:false};
+      if(c.status==='Replied') upd.status='Sent';
+      result = await supa.from('contacts').update(upd).eq('id', id);
+    } else {
+      result = await supa.from('contacts').update({replied:true, status:'Replied'}).eq('id', id);
+    }
+  }
   if(act==='followup'){
     const t = todayStr();
     result = await supa.from('contacts').update({date_sent:t, follow_up_date:addDays(t,3), status:'Sent'}).eq('id', id);
@@ -581,7 +776,7 @@ async function handleAction(act,id){
     showToast('Something went wrong, check console', true);
     return;
   }
-  let msg = {reply:'Marked as replied', won:'Marked as won', lost:'Marked as lost', meeting:'Meeting booked', reopen:'Reopened', del:'Deleted'}[act] || 'Updated';
+  let msg = {reply:'Marked as replied', won:'Marked as won', lost:'Marked as lost', meeting:'Meeting booked', reopen:'Reopened', del:'Deleted', togglereplied:'Reply updated'}[act] || 'Updated';
   if(act==='followup') msg = `Logged, next follow-up ${addDays(todayStr(),3)}`;
   showToast(msg);
   await loadContacts(); renderAll();
@@ -597,6 +792,7 @@ function openEditModal(contact){
   document.getElementById('e_id').value = contact.id;
   document.getElementById('e_name').value = contact.name || '';
   document.getElementById('e_company').value = contact.company || '';
+  document.getElementById('e_website').value = contact.website || '';
   document.getElementById('e_channel').value = contact.channel || 'LinkedIn';
   document.getElementById('e_dateSent').value = contact.date_sent || todayStr();
   document.getElementById('e_followUp').value = contact.follow_up_date || todayStr();
@@ -626,6 +822,7 @@ document.getElementById('editForm').addEventListener('submit', async e=>{
   const updates = {
     name: document.getElementById('e_name').value.trim(),
     company: document.getElementById('e_company').value.trim(),
+    website: document.getElementById('e_website').value.trim(),
     channel: document.getElementById('e_channel').value,
     date_sent: document.getElementById('e_dateSent').value,
     follow_up_date: document.getElementById('e_followUp').value,
@@ -649,6 +846,57 @@ document.getElementById('editForm').addEventListener('submit', async e=>{
 // ============================================
 
 
+
+// --- Row menu (three dots) ---
+function closeRowMenu(){ const m = document.getElementById('rowMenu'); if(m) m.remove(); }
+function openRowMenu(btn, id){
+  closeRowMenu();
+  const m = document.createElement('div');
+  m.id = 'rowMenu';
+  m.className = 'row-menu';
+  m.innerHTML = '<button data-m="view">View details</button><button data-m="follow">Set follow-up date</button><button data-m="del" class="danger">Delete prospect</button>';
+  document.body.appendChild(m);
+  const r = btn.getBoundingClientRect();
+  m.style.top = (r.bottom + 6) + 'px';
+  m.style.left = Math.max(8, r.right - m.offsetWidth) + 'px';
+  m.querySelectorAll('button').forEach(b => b.onclick = (e) => {
+    e.stopPropagation();
+    closeRowMenu();
+    if(b.dataset.m === 'view') openDrawer(id);
+    if(b.dataset.m === 'follow') openFollowModal(id);
+    if(b.dataset.m === 'del') handleAction('del', id);
+  });
+}
+document.addEventListener('click', closeRowMenu);
+window.addEventListener('scroll', closeRowMenu, true);
+
+// --- Set follow-up date ---
+function openFollowModal(id){
+  const c = contacts.find(x => x.id === id);
+  if(!c) return;
+  document.getElementById('fu_id').value = id;
+  document.getElementById('fu_date').value = c.follow_up_date || todayStr();
+  document.getElementById('followModalOverlay').classList.add('open');
+}
+function closeFollowModal(){
+  document.getElementById('followModalOverlay').classList.remove('open');
+}
+document.getElementById('closeFollowModal').addEventListener('click', closeFollowModal);
+document.getElementById('followModalOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'followModalOverlay') closeFollowModal();
+});
+document.getElementById('followForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  if(!supa) return;
+  const id = document.getElementById('fu_id').value;
+  const { error } = await supa.from('contacts').update({follow_up_date: document.getElementById('fu_date').value}).eq('id', id);
+  if(error){ console.error(error); showToast('Could not save date', true); return; }
+  showToast('Follow-up date updated');
+  await loadContacts();
+  closeFollowModal();
+  renderAll();
+  flashRow(id);
+});
 
 // --- Drawer Logic ---
 const drawerOverlay = document.getElementById('drawerOverlay');
@@ -685,7 +933,7 @@ function openDrawer(contactId){
     </div>
     <div class="detail-group">
       <label>Status</label>
-      <p style="color:${statusColor}; font-weight:600;">${esc(status)}</p>
+      <p style="color:${statusColor}; font-weight:600;">${esc(status==='Upcoming' ? 'Active' : status)}</p>
     </div>
     <div class="detail-group">
       <label>Date Sent</label>
@@ -729,6 +977,75 @@ document.addEventListener('keydown', (e)=>{
   if(e.key === 'Escape' && drawerOverlay.classList.contains('open')) closeDrawer();
 });
 
+// --- Sorting ---
+function sortVal(c, key){
+  if(key==='company') return (c.company||c.name||'').toLowerCase();
+  if(key==='channel') return (c.channel||'').toLowerCase();
+  if(key==='date_sent') return c.date_sent||'';
+  if(key==='follow_up_date') return c.follow_up_date||'';
+  if(key==='status') return c._status||'';
+  if(key==='replied') return (c.replied || ['Replied','Meeting Booked','Won'].includes(c.status)) ? 1 : 0;
+  return '';
+}
+function updateSortUI(){
+  document.querySelectorAll('th[data-sort]').forEach(th=>{
+    const on = th.dataset.sort===sortKey;
+    th.classList.toggle('sorted', on);
+    th.querySelector('.arr').textContent = on ? (sortDir==='asc' ? ' ▲' : ' ▼') : ' ⇅';
+  });
+  const s = document.getElementById('sortSelect');
+  const v = sortKey+':'+sortDir;
+  s.value = [...s.options].some(o=>o.value===v) ? v : '';
+}
+document.querySelector('thead').addEventListener('click', e=>{
+  const th = e.target.closest('th[data-sort]');
+  if(!th) return;
+  const k = th.dataset.sort;
+  if(sortKey===k){ sortDir = sortDir==='asc' ? 'desc' : 'asc'; }
+  else { sortKey = k; sortDir = (k==='replied' || k==='date_sent') ? 'desc' : 'asc'; }
+  page = 1;
+  renderRows();
+});
+document.getElementById('listSearch').addEventListener('input', e=>{
+  listQuery = e.target.value;
+  page = 1;
+  renderTabs();
+  renderRows();
+});
+document.getElementById('sortSelect').addEventListener('change', e=>{
+  if(!e.target.value) return;
+  const [k,d] = e.target.value.split(':');
+  sortKey = k; sortDir = d; page = 1;
+  renderRows();
+});
+
+// --- Pagination ---
+function renderPager(total, pages, start){
+  const el = document.getElementById('pager');
+  if(!total){ el.innerHTML = ''; return; }
+  const from = start + 1, to = Math.min(start + pageSize, total);
+  const nums = [];
+  for(let p=1; p<=pages; p++){
+    if(p===1 || p===pages || Math.abs(p-page)<=1) nums.push(p);
+    else if(nums[nums.length-1] !== '…') nums.push('…');
+  }
+  el.innerHTML = `
+    <div>Show <select id="pageSizeSel">${[10,25,50].map(n=>`<option value="${n}" ${n===pageSize?'selected':''}>${n}</option>`).join('')}</select> per page</div>
+    <div>${from}–${to} of ${total}</div>
+    <div class="pager-nav">
+      <button class="pg" data-p="${page-1}" ${page===1?'disabled':''}>‹</button>
+      ${nums.map(n => n==='…' ? '<span class="pg-dots">…</span>' : `<button class="pg ${n===page?'on':''}" data-p="${n}">${n}</button>`).join('')}
+      <button class="pg" data-p="${page+1}" ${page===pages?'disabled':''}>›</button>
+    </div>`;
+  el.querySelector('#pageSizeSel').onchange = e => {
+    pageSize = Number(e.target.value);
+    localStorage.setItem('gu_pageSize', pageSize);
+    page = 1;
+    renderRows();
+  };
+  el.querySelectorAll('button.pg').forEach(b => b.onclick = () => { page = Number(b.dataset.p); renderRows(); });
+}
+
 // --- Add Form ---
 document.getElementById('addForm').addEventListener('submit', async e=>{
   e.preventDefault();
@@ -740,6 +1057,7 @@ document.getElementById('addForm').addEventListener('submit', async e=>{
     id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
     name: document.getElementById('f_name').value.trim(),
     company: document.getElementById('f_company').value.trim(),
+    website: document.getElementById('f_website').value.trim(),
     channel: document.getElementById('f_channel').value,
     date_sent: dateSent,
     follow_up_date: addDays(dateSent, days),
